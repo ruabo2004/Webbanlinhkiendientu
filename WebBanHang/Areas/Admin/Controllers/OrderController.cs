@@ -1,6 +1,7 @@
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Data.Entity;
 using System.Dynamic;
 using System.Linq;
 using System.Web.Mvc;
@@ -192,6 +193,63 @@ namespace WebBanLinhKienDienTu.Areas.Admin.Controllers
       return View(order);
     }
 
+    /// <summary>
+    /// Action để thủ công trừ số lượng sản phẩm từ kho cho đơn hàng đã hoàn thành
+    /// </summary>
+    [HttpPost]
+    public ActionResult DeductInventory(int? id)
+    {
+      dynamic result = new ExpandoObject();
+      result.success = false;
+      result.message = "";
+
+      if (id == null)
+      {
+        result.message = "Thiếu mã đơn đặt hàng";
+        return Content(JsonConvert.SerializeObject(result), "application/json");
+      }
+
+      var order = Repository.Order.FindById(id);
+      if (order == null)
+      {
+        result.message = "Đơn đặt hàng này không tồn tại";
+        return Content(JsonConvert.SerializeObject(result), "application/json");
+      }
+
+      // Kiểm tra xem order có đủ 3 điều kiện chưa
+      bool isComplete = (order.OrderStatusID == 3 && order.Paid && order.ShippingStatusID == 3);
+      if (!isComplete)
+      {
+        result.message = "Đơn hàng chưa hoàn thành đủ 3 điều kiện (Trạng thái đơn, Thanh toán, Giao hàng)";
+        return Content(JsonConvert.SerializeObject(result), "application/json");
+      }
+
+      // Kiểm tra xem đã trừ kho chưa
+      if (IsInventoryDeducted(order))
+      {
+        result.message = "Đơn hàng này đã được trừ số lượng sản phẩm từ kho trước đó";
+        return Content(JsonConvert.SerializeObject(result), "application/json");
+      }
+
+      try
+      {
+        DeductProductInventory(order);
+        
+        // Lưu flag đã trừ vào Comment
+        MarkInventoryDeducted(order);
+        Repository.Order.SaveChanges();
+        
+        result.success = true;
+        result.message = "Đã trừ số lượng sản phẩm từ kho thành công";
+      }
+      catch (Exception ex)
+      {
+        result.message = "Có lỗi xảy ra khi trừ số lượng: " + ex.Message;
+      }
+
+      return Content(JsonConvert.SerializeObject(result), "application/json");
+    }
+
     public ActionResult OrderStatusOption()
     {
       var orderStatus = Repository.Create<OrderStatu>().FetchAll();
@@ -252,6 +310,7 @@ namespace WebBanLinhKienDienTu.Areas.Admin.Controllers
 
       int oldOderStatus = order.OrderStatusID;
       int oldShipping = order.ShippingStatusID;
+      bool oldPaid = order.Paid;
 
       if (orderStatus != null)
       {
@@ -278,6 +337,26 @@ namespace WebBanLinhKienDienTu.Areas.Admin.Controllers
       }
 
       Repository.Order.SaveChanges();
+      
+      // Reload order to get latest status after save
+      order = Repository.Order.FindById(id);
+      
+      // Check if order is complete (all 3 conditions met) and deduct inventory
+      bool isCompleteNow = (order.OrderStatusID == 3 && order.Paid && order.ShippingStatusID == 3);
+      
+      if (isCompleteNow)
+      {
+        // Kiểm tra xem đã trừ kho chưa
+        if (!IsInventoryDeducted(order))
+        {
+          // Order is complete và chưa trừ - deduct inventory
+          DeductProductInventory(order);
+          
+          // Lưu flag đã trừ vào Comment
+          MarkInventoryDeducted(order);
+          Repository.Order.SaveChanges();
+        }
+      }
       
       // Auto-update customer rank when order is completed AND paid
       if (orderStatus.HasValue && orderStatus.Value == 3 && oldOderStatus != 3 && order.Paid && order.CustomerID > 0)
@@ -317,8 +396,29 @@ namespace WebBanLinhKienDienTu.Areas.Admin.Controllers
       }
 
       bool wasUnpaid = !order.Paid;
+      bool wasCompleteBefore = (order.OrderStatusID == 3 && order.Paid && order.ShippingStatusID == 3);
       order.Paid = paid;
       Repository.Order.SaveChanges();
+      
+      // Reload order to get latest status after save
+      order = Repository.Order.FindById(id);
+      
+      // Check if order is complete (all 3 conditions met) and deduct inventory
+      bool isCompleteNow = (order.OrderStatusID == 3 && order.Paid && order.ShippingStatusID == 3);
+      
+      if (isCompleteNow)
+      {
+        // Kiểm tra xem đã trừ kho chưa
+        if (!IsInventoryDeducted(order))
+        {
+          // Order is complete và chưa trừ - deduct inventory
+          DeductProductInventory(order);
+          
+          // Lưu flag đã trừ vào Comment
+          MarkInventoryDeducted(order);
+          Repository.Order.SaveChanges();
+        }
+      }
       
       // Auto-update customer rank when order is marked as paid AND completed
       if (paid && wasUnpaid && order.OrderStatusID == 3 && order.CustomerID > 0)
@@ -411,6 +511,114 @@ namespace WebBanLinhKienDienTu.Areas.Admin.Controllers
       }
 
       return "label-" + statusColor;
+    }
+
+    /// <summary>
+    /// Kiểm tra xem đơn hàng đã được trừ số lượng sản phẩm chưa
+    /// </summary>
+    private bool IsInventoryDeducted(Order order)
+    {
+      const string INVENTORY_DEDUCTED_FLAG = "[INVENTORY_DEDUCTED]";
+      return !string.IsNullOrEmpty(order.Comment) && order.Comment.Contains(INVENTORY_DEDUCTED_FLAG);
+    }
+
+    /// <summary>
+    /// Đánh dấu đơn hàng đã được trừ số lượng sản phẩm
+    /// </summary>
+    private void MarkInventoryDeducted(Order order)
+    {
+      const string INVENTORY_DEDUCTED_FLAG = "[INVENTORY_DEDUCTED]";
+      if (string.IsNullOrEmpty(order.Comment))
+      {
+        order.Comment = INVENTORY_DEDUCTED_FLAG;
+      }
+      else if (!order.Comment.Contains(INVENTORY_DEDUCTED_FLAG))
+      {
+        order.Comment = order.Comment.Trim() + " " + INVENTORY_DEDUCTED_FLAG;
+      }
+    }
+
+    /// <summary>
+    /// Trừ số lượng sản phẩm từ kho khi đơn hàng hoàn thành (cả 3 trạng thái đều thành công)
+    /// </summary>
+    private void DeductProductInventory(Order order)
+    {
+      try
+      {
+        var db = Repository.DbContext;
+        
+        System.Diagnostics.Debug.WriteLine($"=== Deducting inventory for Order #{order.OrderID} ===");
+        System.Diagnostics.Debug.WriteLine($"OrderStatusID: {order.OrderStatusID}, Paid: {order.Paid}, ShippingStatusID: {order.ShippingStatusID}");
+        
+        // Load OrderDetails với Product để kiểm tra UseMultiColor
+        var orderDetails = db.Set<OrderDetail>()
+          .Where(od => od.OrderID == order.OrderID)
+          .Include(od => od.Product)
+          .ToList();
+
+        System.Diagnostics.Debug.WriteLine($"Found {orderDetails.Count} order details");
+
+        foreach (var orderDetail in orderDetails)
+        {
+          var product = orderDetail.Product;
+          if (product == null)
+          {
+            System.Diagnostics.Debug.WriteLine($"OrderDetail {orderDetail.DetailID}: Product is null, skipping");
+            continue;
+          }
+
+          int quantityToDeduct = orderDetail.Quantity;
+          System.Diagnostics.Debug.WriteLine($"Processing: ProductID={product.ProductID}, Quantity={quantityToDeduct}, UseMultiColor={product.UseMultiColor}, ColorID={orderDetail.ColorID}");
+
+          // Luôn trừ từ Product.Stock (số lượng tổng) vì đây là số lượng hiển thị trong Admin/Product
+          var productToUpdate = Repository.Product.FindById(product.ProductID);
+          if (productToUpdate != null)
+          {
+            var oldStock = productToUpdate.Stock;
+            productToUpdate.Stock = Math.Max(0, productToUpdate.Stock - quantityToDeduct);
+            Repository.Product.SaveChanges();
+            System.Diagnostics.Debug.WriteLine($"Product Stock - Old: {oldStock}, New: {productToUpdate.Stock}, Deducted: {quantityToDeduct}");
+            
+            // Nếu sản phẩm có nhiều màu và có ColorID, cũng trừ từ bảng Quantity (nếu có)
+            if (product.UseMultiColor && orderDetail.ColorID.HasValue)
+            {
+              var colorId = orderDetail.ColorID.Value;
+              
+              // Kiểm tra xem có record trong Quantity chưa
+              var checkSql = "SELECT COUNT(*) FROM Quantity WHERE ProductID = @p0 AND ColorID = @p1";
+              var exists = db.Database.SqlQuery<int>(checkSql, product.ProductID, colorId).FirstOrDefault() > 0;
+              
+              if (exists)
+              {
+                // Có record - cập nhật Stock trong Quantity
+                var updateSql = @"
+                  UPDATE Quantity 
+                  SET Stock = CASE 
+                    WHEN Stock - @p0 < 0 THEN 0 
+                    ELSE Stock - @p0 
+                  END
+                  WHERE ProductID = @p1 AND ColorID = @p2";
+                
+                var rowsAffected = db.Database.ExecuteSqlCommand(updateSql, quantityToDeduct, product.ProductID, colorId);
+                System.Diagnostics.Debug.WriteLine($"Quantity table also updated. Rows affected: {rowsAffected}");
+              }
+            }
+          }
+          else
+          {
+            System.Diagnostics.Debug.WriteLine($"Product {product.ProductID} not found, skipping");
+          }
+        }
+        
+        System.Diagnostics.Debug.WriteLine($"=== Finished deducting inventory for Order #{order.OrderID} ===");
+      }
+      catch (Exception ex)
+      {
+        // Log error nhưng không throw để không ảnh hưởng đến việc cập nhật trạng thái đơn hàng
+        System.Diagnostics.Debug.WriteLine("Error deducting product inventory: " + ex.Message);
+        System.Diagnostics.Debug.WriteLine("StackTrace: " + ex.StackTrace);
+        // Có thể log vào file log ở đây nếu cần
+      }
     }
   }
 }
