@@ -1,0 +1,156 @@
+@model Coupon
+@{
+    ViewBag.Title = "Thêm mã giảm giá mới";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutPage.cshtml";
+}
+
+<div class="container">
+    @using (Html.BeginForm("Create", "Coupon", FormMethod.Post, new { @class = "form-horizontal", id = "couponForm" }))
+    {
+        @Html.AntiForgeryToken()
+        
+        <!-- Page-Title -->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="btn-group pull-right m-t-15">
+                    <button type="submit" class="btn btn-primary waves-effect waves-light">
+                        <span class="btn-label">
+                            <i class="zmdi zmdi-check"></i>
+                        </span>Lưu
+                    </button>
+                    <a href="@Url.Action("Index")" class="btn btn-default waves-effect waves-light m-l-5">
+                        <span class="btn-label">
+                            <i class="zmdi zmdi-close"></i>
+                        </span>Hủy
+                    </a>
+                </div>
+                <h4 class="page-title">@ViewBag.Title</h4>
+            </div>
+        </div>
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <!--Form-->
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="card-box">
+                    <h5 class="card-title">Thông tin mã giảm giá</h5>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Mã giảm giá <span class="text-danger">*</span></label>
+                        </div>
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.Code, new { @class = "form-control", placeholder = "VD: WELCOME2025", style = "text-transform: uppercase;" })
+                            @Html.ValidationMessageFor(m => m.Code, "", new { @class = "text-danger" })
+                            <small class="text-muted">Nhập mã không dấu, viết hoa</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Loại giảm giá <span class="text-danger">*</span></label>
+                        </div>
+                        <div class="col-md-3">
+                            @Html.DropDownListFor(m => m.Type, new SelectList(new[] {
+                                new { Value = "Percent", Text = "Phần trăm (%)" },
+                                new { Value = "Amount", Text = "Số tiền (VNĐ)" }
+                            }, "Value", "Text"), new { @class = "form-control", id = "couponType" })
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Giá trị giảm <span class="text-danger">*</span></label>
+                        </div>
+                        <div class="col-md-3">
+                            @Html.TextBoxFor(m => m.Discount, new { @class = "form-control", type = "number", min = "0", placeholder = "VD: 100000 hoặc 10" })
+                            @Html.ValidationMessageFor(m => m.Discount, "", new { @class = "text-danger" })
+                            <small class="text-muted" id="discountHint">Nhập số tiền (VNĐ) hoặc % (0-100)</small>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Miễn phí vận chuyển</label>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="checkbox checkbox-primary">
+                                <input type="checkbox" id="freeShipCheckbox" name="FreeShip" value="true" @(Model.FreeShip.GetValueOrDefault() ? "checked" : "") />
+                                <label for="freeShipCheckbox">Áp dụng miễn phí ship</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Thời gian áp dụng</label>
+                        </div>
+                        <div class="col-md-3">
+                            <label>Từ ngày:</label>
+                            @Html.TextBoxFor(m => m.StartDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.StartDate, "", new { @class = "text-danger" })
+                        </div>
+                        <div class="col-md-3">
+                            <label>Đến ngày:</label>
+                            @Html.TextBoxFor(m => m.EndDate, "{0:yyyy-MM-dd}", new { @class = "form-control", type = "date" })
+                            @Html.ValidationMessageFor(m => m.EndDate, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Không giới hạn thời gian</label>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="checkbox checkbox-primary">
+                                <input type="checkbox" id="indefiniteCheckbox" name="Indefinite" value="true" @(Model.Indefinite.GetValueOrDefault() ? "checked" : "") />
+                                <label for="indefiniteCheckbox">Mã luôn có hiệu lực</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15 row">
+                        <div class="col-sm-2 align-right">
+                            <label class="control-label">Trạng thái</label>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="checkbox checkbox-primary">
+                                <input type="checkbox" id="activeCheckbox" name="Active" value="true" @(Model.Active ? "checked" : "") />
+                                <label for="activeCheckbox">Kích hoạt ngay</label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+@section scripts {
+    <script>
+        $(document).ready(function () {
+            // Auto uppercase code
+            $('#Code').on('input', function () {
+                this.value = this.value.toUpperCase();
+            });
+
+            // Update hint based on type
+            $('#couponType').on('change', function () {
+                var type = $(this).val();
+                if (type === 'Percent') {
+                    $('#discountHint').text('Nhập % (0-100)');
+                    $('#Discount').attr('max', '100');
+                } else {
+                    $('#discountHint').text('Nhập số tiền (VNĐ)');
+                    $('#Discount').removeAttr('max');
+                }
+            });
+
+            // Trigger change on load
+            $('#couponType').trigger('change');
+        });
+    </script>
+}
+

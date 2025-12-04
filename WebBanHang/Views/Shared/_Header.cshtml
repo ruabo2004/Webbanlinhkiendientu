@@ -1,0 +1,17 @@
+@using WebBanLinhKienDienTu.Utils
+@{
+    var Data = ViewBag.Data;
+    var config = Data.Config as DefaultableDictionary<String, String>;
+}
+<!-- ============================================== HEADER ============================================== -->
+<header class="header-style-1">
+    @Html.Partial("_Topbar")
+    @* <div class="main-header"> *@
+    @*     <div class="container"> *@
+    @*          *@
+    @*     </div><!-- /.container --> *@
+    @* </div><!-- /.main-header --> *@
+    @Html.Action("Navbar","Widget")
+</header>
+<!-- ============================================== HEADER : END ============================================== -->
+

@@ -1,0 +1,945 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="Trang quản trị viên">
+    <meta name="author" content="ShyBox">
+    <meta name="robots" content="noindex, nofollow">
+
+    <!-- App Favicon -->
+    <link rel="shortcut icon" href="~/Content/images/favicon.ico">
+
+    <!-- App title -->
+    <title>@ViewBag.Data.Config["site_title"] - Admin - @ViewBag.Title</title>
+
+    <!-- Bootstrap Core CSS from main site -->
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css">
+
+    <!-- Customizable CSS from main site -->
+    <link rel="stylesheet" href="~/Content/css/main.css">
+    <link rel="stylesheet" href="~/Content/css/spaces-utils.css">
+    <link rel="stylesheet" href="~/Content/css/green.css">
+
+    <!-- Icons/Glyphs -->
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css">
+
+    <!-- Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
+
+    <!-- Switchery css -->
+    <link href="~/Content/admin/plugins/switchery/switchery.min.css" rel="stylesheet" />
+
+    <!-- Sweet Alert css -->
+    <link href="~/Content/admin/plugins/bootstrap-sweetalert/sweet-alert.css" rel="stylesheet" />
+
+    <!-- DataTables -->
+    <link href="~/Content/admin/plugins/datatables/dataTables.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <link href="~/Content/admin/plugins/datatables/buttons.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Responsive datatable examples -->
+    <link href="~/Content/admin/plugins/datatables/responsive.bootstrap4.min.css" rel="stylesheet" type="text/css" />
+    <!-- Datatable Reoder -->
+    <link href="~/Content/admin/plugins/rowReoder/rowReorder.dataTables.min.css" rel="stylesheet" type="text/css" />
+
+    <!-- Uploader -->
+    <link href="~/Content/admin/plugins/ssi-uploader/ssi-uploader.css" rel="stylesheet" type="text/css" />
+
+    <!--Plugin CSS-->
+    @Styles.Render("~/bundles/plugin-css")
+
+    <!-- App CSS -->
+    <link href="~/Content/admin/css/style.css" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="~/Content/css/bootstrap-msg.min.css">
+    <link href="~/Content/admin/css/custom.css" rel="stylesheet" type="text/css" />
+    
+    <!-- Custom Admin Style with Red Theme and Sidebar -->
+    <style>
+        :root {
+            --admin-red: #D70018;
+            --admin-red-dark: #B50014;
+            --admin-red-light: #FF001F;
+            --admin-blue: #3498db;
+            --admin-blue-dark: #2980b9;
+            --admin-bg: #f5f5f5;
+        }
+        
+        * {
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            font-size: 13px;
+            color: #666666;
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+        }
+        
+        /* Sidebar Styles */
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background-color: var(--admin-red);
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: all 0.3s ease;
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+        
+        #sidebar.collapsed {
+            width: 70px;
+        }
+        
+        .sidebar-header {
+            padding: 15px 40px;
+            background-color: var(--admin-red);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70px;
+            width: 100%;
+        }
+        
+        .sidebar-logo {
+            display: flex;
+            align-items: center;
+            color: #fff;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            justify-content: flex-start;
+        }
+        
+        .sidebar-logo img {
+            flex-shrink: 0;
+            max-height: 50px;
+            max-width: 180px;
+            width: auto;
+            height: auto;
+        }
+        
+        .sidebar-title {
+            margin-left: 12px;
+            white-space: nowrap;
+            overflow: visible;
+            text-overflow: clip;
+            flex: 1;
+        }
+        
+        #sidebar.collapsed .sidebar-title {
+            display: none;
+        }
+        
+        #sidebar.collapsed .sidebar-logo {
+            justify-content: center;
+        }
+        
+        
+        .sidebar-menu {
+            padding: 10px 0;
+        }
+        
+        .sidebar-menu-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu-item {
+            margin: 5px 0;
+        }
+        
+        .sidebar-menu-link {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 3px solid transparent;
+            background-color: transparent;
+        }
+        
+        .sidebar-menu-link:hover {
+            background-color: rgba(0,0,0,0.15);
+            border-left-color: rgba(255,255,255,0.5);
+            color: #fff !important;
+        }
+        
+        .sidebar-menu-link.active {
+            background-color: rgba(0,0,0,0.3);
+            border-left-color: #fff;
+            color: #fff !important;
+        }
+        
+        .sidebar-menu-link i {
+            width: 20px;
+            margin-right: 12px;
+            font-size: 16px;
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        /* Force white color for all icons in sidebar - remove any blue */
+        #sidebar i,
+        #sidebar .sidebar-menu-link i,
+        #sidebar .sidebar-menu-link:hover i,
+        #sidebar .sidebar-menu-link:active i,
+        #sidebar .sidebar-menu-link:focus i,
+        #sidebar .sidebar-menu-link.active i,
+        #sidebar .sidebar-submenu-link i,
+        #sidebar .sidebar-submenu-link:hover i,
+        #sidebar .sidebar-submenu-link:active i,
+        #sidebar .sidebar-submenu-link:focus i,
+        #sidebar [class*="fa-"],
+        #sidebar [class*="fa-"]:hover,
+        #sidebar [class*="fa-"]:active,
+        #sidebar [class*="fa-"]:focus {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        #sidebar .sidebar-menu-link:hover i,
+        #sidebar .sidebar-menu-link:active i,
+        #sidebar .sidebar-menu-link:focus i,
+        #sidebar .sidebar-menu-link.active i,
+        #sidebar .sidebar-submenu-link:hover i,
+        #sidebar .sidebar-submenu-link:active i,
+        #sidebar .sidebar-submenu-link:focus i,
+        #sidebar .sidebar-menu-link:hover [class*="fa-"],
+        #sidebar .sidebar-menu-link:active [class*="fa-"],
+        #sidebar .sidebar-menu-link:focus [class*="fa-"],
+        #sidebar .sidebar-menu-link.active [class*="fa-"] {
+            color: #fff !important;
+        }
+        
+        body.sidebar-collapsed #sidebar .sidebar-menu-text {
+            display: none;
+        }
+        
+        /* Force white color for sidebar menu text - remove any blue */
+        .sidebar-menu-text,
+        #sidebar .sidebar-menu-text,
+        #sidebar .sidebar-menu-link .sidebar-menu-text,
+        #sidebar .sidebar-menu-link span,
+        #sidebar .sidebar-menu-link:hover .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:hover span,
+        #sidebar .sidebar-menu-link:active .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:active span,
+        #sidebar .sidebar-menu-link:focus .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:focus span,
+        #sidebar .sidebar-menu-link.active .sidebar-menu-text,
+        #sidebar .sidebar-menu-link.active span {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        #sidebar .sidebar-menu-link:hover .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:hover span,
+        #sidebar .sidebar-menu-link:active .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:active span,
+        #sidebar .sidebar-menu-link:focus .sidebar-menu-text,
+        #sidebar .sidebar-menu-link:focus span,
+        #sidebar .sidebar-menu-link.active .sidebar-menu-text,
+        #sidebar .sidebar-menu-link.active span {
+            color: #fff !important;
+        }
+        
+        /* Also for submenu */
+        .sidebar-submenu-text,
+        #sidebar .sidebar-submenu-link span,
+        #sidebar .sidebar-submenu-link:hover span,
+        #sidebar .sidebar-submenu-link:active span,
+        #sidebar .sidebar-submenu-link:focus span {
+            color: rgba(255,255,255,0.8) !important;
+        }
+        
+        #sidebar .sidebar-submenu-link:hover span,
+        #sidebar .sidebar-submenu-link:active span,
+        #sidebar .sidebar-submenu-link:focus span {
+            color: #fff !important;
+        }
+        
+        body.sidebar-collapsed #sidebar .sidebar-title {
+            display: none;
+        }
+        
+        body.sidebar-collapsed #sidebar .sidebar-logo {
+            justify-content: center;
+        }
+        
+        body.sidebar-collapsed #sidebar .sidebar-menu-arrow {
+            display: none;
+        }
+        
+        body.sidebar-collapsed #sidebar .sidebar-submenu {
+            display: none !important;
+        }
+        
+        .sidebar-menu-arrow {
+            margin-left: auto;
+            transition: transform 0.3s ease;
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        /* Force white color for chevron arrow - remove any blue */
+        #sidebar .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:hover .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:active .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:focus .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link.active .sidebar-menu-arrow,
+        #sidebar .fa-chevron-down,
+        #sidebar .fa-chevron-down:hover,
+        #sidebar .fa-chevron-down:active,
+        #sidebar .fa-chevron-down:focus,
+        #sidebar .sidebar-menu-link:hover .fa-chevron-down,
+        #sidebar .sidebar-menu-link:active .fa-chevron-down,
+        #sidebar .sidebar-menu-link:focus .fa-chevron-down,
+        #sidebar .sidebar-menu-link.active .fa-chevron-down {
+            color: rgba(255,255,255,0.9) !important;
+        }
+        
+        #sidebar .sidebar-menu-link:hover .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:active .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:focus .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link.active .sidebar-menu-arrow,
+        #sidebar .sidebar-menu-link:hover .fa-chevron-down,
+        #sidebar .sidebar-menu-link:active .fa-chevron-down,
+        #sidebar .sidebar-menu-link:focus .fa-chevron-down,
+        #sidebar .sidebar-menu-link.active .fa-chevron-down {
+            color: #fff !important;
+        }
+        
+        .sidebar-menu-item.active .sidebar-menu-arrow {
+            transform: rotate(180deg);
+        }
+        
+        .sidebar-submenu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            background-color: rgba(0,0,0,0.2);
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .sidebar-menu-item.active .sidebar-submenu {
+            max-height: 500px;
+        }
+        
+        .sidebar-submenu-link {
+            display: flex;
+            align-items: center;
+            padding: 10px 20px 10px 50px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+        
+        .sidebar-submenu-link:hover {
+            background-color: rgba(0,0,0,0.3);
+            color: #fff;
+            padding-left: 55px;
+        }
+        
+        .sidebar-submenu-link i {
+            width: 16px;
+            margin-right: 8px;
+            font-size: 14px;
+            color: rgba(255,255,255,0.8) !important;
+        }
+        
+        /* Override all icons in sidebar submenu */
+        #sidebar .sidebar-submenu-link i,
+        #sidebar .sidebar-submenu-link:hover i,
+        #sidebar .sidebar-submenu-link:active i,
+        #sidebar .sidebar-submenu-link:focus i {
+            color: rgba(255,255,255,0.8) !important;
+        }
+        
+        #sidebar .sidebar-submenu-link:hover i,
+        #sidebar .sidebar-submenu-link:active i,
+        #sidebar .sidebar-submenu-link:focus i {
+            color: #fff !important;
+        }
+        
+        /* Top Bar Styles - Red Theme */
+        #admin-header {
+            position: fixed;
+            top: 0;
+            left: 260px;
+            right: 0;
+            height: 70px;
+            background-color: var(--admin-red);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 999;
+            transition: left 0.3s ease;
+        }
+        
+        body.sidebar-collapsed #admin-header {
+            left: 70px;
+        }
+        
+        body.sidebar-collapsed #sidebar {
+            width: 70px;
+        }
+        
+        body.sidebar-collapsed .admin-main-content {
+            margin-left: 70px;
+        }
+        
+        .admin-topbar-content {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 100%;
+            padding: 0 20px;
+            gap: 20px;
+        }
+        
+        .admin-sidebar-toggle {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            font-size: 18px;
+            color: #fff;
+            cursor: pointer;
+            padding: 10px 14px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 44px;
+            height: 44px;
+        }
+        
+        .admin-sidebar-toggle:hover {
+            background: rgba(255,255,255,0.25);
+            color: #fff;
+        }
+        
+        .admin-sidebar-toggle:focus {
+            outline: none;
+        }
+        
+        .admin-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex: 1;
+            justify-content: flex-end;
+            min-width: 0;
+        }
+        
+        .admin-topbar-link {
+            color: rgba(255,255,255,0.95);
+            text-decoration: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .admin-topbar-link:hover {
+            background-color: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        
+        .admin-user-dropdown {
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .admin-user-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: rgba(255,255,255,0.95);
+            text-decoration: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+        
+        /* Remove Bootstrap default caret completely */
+        .admin-user-toggle.dropdown-toggle::after {
+            display: none !important;
+            content: none !important;
+        }
+        
+        .admin-user-dropdown .dropdown-toggle::after {
+            display: none !important;
+            content: none !important;
+        }
+        
+        .admin-user-toggle:hover {
+            background-color: rgba(255,255,255,0.2);
+            color: #fff;
+        }
+        
+        .admin-user-toggle:hover::before {
+            color: #fff;
+        }
+        
+        .admin-user-toggle:focus {
+            outline: none;
+        }
+        
+        .admin-username {
+            color: rgba(255,255,255,0.95);
+            max-width: 150px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        .admin-user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        .admin-user-menu {
+            min-width: 200px;
+        }
+        
+        /* Main Content */
+        .admin-main-content {
+            margin-left: 260px;
+            margin-top: 70px;
+            padding: 20px;
+            min-height: calc(100vh - 70px);
+            background-color: var(--admin-bg);
+            transition: margin-left 0.3s ease;
+        }
+        
+        
+        .container {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .card-box {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        /* Buttons - Red/Gray */
+        .btn-primary {
+            background-color: #666;
+            border-color: #666;
+            color: #fff;
+            transition: all 0.2s linear;
+        }
+        
+        .btn-primary:hover,
+        .btn-primary:focus {
+            background-color: #555;
+            border-color: #555;
+            color: #fff;
+            outline: none;
+        }
+        
+        .btn-primary:active,
+        .btn-primary.active {
+            background-color: #444;
+            border-color: #444;
+            color: #fff;
+        }
+        
+        .btn-success {
+            background-color: #666;
+            border-color: #666;
+            color: #fff;
+            transition: all 0.2s linear;
+        }
+        
+        .btn-success:hover,
+        .btn-success:focus {
+            background-color: #555;
+            border-color: #555;
+            color: #fff;
+            outline: none;
+        }
+        
+        .btn-success:active,
+        .btn-success.active {
+            background-color: #444;
+            border-color: #444;
+            color: #fff;
+        }
+        
+        .page-title {
+            color: var(--admin-red);
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .header-title {
+            color: var(--admin-red);
+            font-weight: 500;
+        }
+        
+        /* Table improvements */
+        .table {
+            font-size: 13px;
+        }
+        
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        /* Form improvements */
+        .form-control {
+            border-radius: 4px;
+            border: 1px solid #ddd;
+            transition: all 0.2s linear;
+        }
+        
+        .form-control:focus {
+            border-color: #999;
+            box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0.1);
+            outline: none;
+        }
+        
+        /* Label improvements */
+        .info-title {
+            color: #333;
+            font-weight: 500;
+            margin-bottom: 8px;
+        }
+        
+        /* Tile box improvements */
+        .tilebox-one {
+            border-radius: 8px;
+            transition: all 0.2s linear;
+            border-top: 3px solid var(--admin-red);
+        }
+        
+        .tilebox-one:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        
+        /* Labels with red theme */
+        .label {
+            border-radius: 4px;
+        }
+        
+        .label-success {
+            background-color: var(--admin-blue);
+        }
+        
+        /* Responsive */
+        @@media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+            }
+            
+            #sidebar.show {
+                transform: translateX(0);
+            }
+            
+            #admin-header {
+                left: 0;
+            }
+            
+            .admin-main-content {
+                margin-left: 0;
+            }
+        }
+    </style>
+
+    <!-- HTML5 Shiv and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+        <script src="~/Content/js/html5shiv.js"></script>
+        <script src="~/Content/js/respond.min.js"></script>
+    <![endif]-->
+    <!-- Modernizr js -->
+    <script src="~/Content/admin/js/modernizr.min.js"></script>
+</head>
+
+<body style="background-color: #f5f5f5;">
+
+    <!-- Sidebar -->
+    @Html.Partial("Sidebar")
+    <!-- End Sidebar -->
+    
+    <!-- Top Bar -->
+    @Html.Partial("Header")
+    <!-- End Top Bar -->
+    
+    <!-- Main Content -->
+    <div class="admin-main-content" id="admin-main-content">
+        @RenderBody()
+    </div> <!-- End main content -->
+
+    <script>
+        var resizefunc = [];
+    </script>
+
+    <!-- jQuery  -->
+    <script src="~/Content/js/jquery-1.11.1.min.js"></script>
+    <script src="~/Content/admin/js/tether.min.js"></script><!-- Tether for Bootstrap -->
+    <script src="~/Content/js/bootstrap.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/admin/js/waves.js"></script>
+    <script src="~/Content/admin/js/jquery.nicescroll.js"></script>
+    <script src="~/Content/admin/plugins/switchery/switchery.min.js"></script>
+    
+    <!-- CounterUp Plugin -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Counter-Up/1.0.0/jquery.counterup.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/waypoints/4.0.1/jquery.waypoints.min.js"></script>
+
+    <!--Tinymce Editor-->
+    <script src='/Content/admin/plugins/tinymce/tinymce.min.js'></script>
+
+    <!-- Required datatable js -->
+    <script src="~/Content/admin/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="~/Content/admin/plugins/datatables/dataTables.bootstrap4.min.js"></script>
+    <script src="~/Content/admin/plugins/rowReoder/dataTables.rowReorder.min.js"></script>
+
+    <!-- Required auto format number js -->
+    <script src="~/Content/admin/plugins/autoNumeric/autoNumeric.js" type="text/javascript"></script>
+
+    <script type="text/javascript" src="~/Content/js/bootstrap-msg.min.js"></script>
+    <!-- Sweet Alert js -->
+    <script src="~/Content/admin/plugins/bootstrap-sweetalert/sweet-alert.min.js"></script>
+
+    <!-- Uploader -->
+    <script src="~/Content/admin/plugins/ssi-uploader/ssi-uploader.min.js"></script>
+
+    <!--Plugin JS-->
+    @Scripts.Render("~/bundles/plugin-js")
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+
+    <!-- SignalR -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/signalr.js/2.4.3/jquery.signalR.min.js"></script>
+    <script src="~/signalr/hubs"></script>
+
+    <!-- App js -->
+    <script src="~/Content/admin/js/jquery.core.js"></script>
+    <script src="~/Content/admin/js/jquery.app.js"></script>
+    <script src="~/Content/admin/js/custom.js"></script>
+    
+    <!-- Sidebar Toggle Script -->
+    <script>
+        $(document).ready(function() {
+            // Sidebar toggle - chỉ dùng nút trong topbar
+            $('#admin-sidebar-toggle').on('click', function() {
+                $('body').toggleClass('sidebar-collapsed');
+                // Lưu trạng thái vào localStorage
+                if ($('body').hasClass('sidebar-collapsed')) {
+                    localStorage.setItem('admin-sidebar-collapsed', 'true');
+                } else {
+                    localStorage.setItem('admin-sidebar-collapsed', 'false');
+                }
+            });
+            
+            // Khôi phục trạng thái sidebar từ localStorage
+            var sidebarCollapsed = localStorage.getItem('admin-sidebar-collapsed');
+            if (sidebarCollapsed === 'true') {
+                $('body').addClass('sidebar-collapsed');
+            }
+            
+            // Submenu toggle
+            $('.sidebar-menu-item.has-submenu > .sidebar-menu-link').on('click', function(e) {
+                e.preventDefault();
+                var $item = $(this).closest('.sidebar-menu-item');
+                
+                // Nếu sidebar đang collapsed, mở nó ra
+                if ($('body').hasClass('sidebar-collapsed')) {
+                    $('body').removeClass('sidebar-collapsed');
+                    localStorage.setItem('admin-sidebar-collapsed', 'false');
+                }
+                
+                $item.siblings().removeClass('active');
+                $item.toggleClass('active');
+            });
+            
+            // Khi click vào menu item hoặc submenu item, nếu sidebar đang collapsed thì mở ra
+            $('.sidebar-menu-link, .sidebar-submenu-link').on('click', function(e) {
+                // Nếu sidebar đang collapsed, mở nó ra
+                if ($('body').hasClass('sidebar-collapsed')) {
+                    $('body').removeClass('sidebar-collapsed');
+                    localStorage.setItem('admin-sidebar-collapsed', 'false');
+                }
+            });
+            
+            // Set active menu item based on current URL - chỉ set cho item đúng trang hiện tại
+            var currentUrl = window.location.pathname.toLowerCase();
+            var activeSet = false;
+            
+            // Xóa tất cả active classes trước
+            $('.sidebar-menu-link, .sidebar-submenu-link, .sidebar-menu-item').removeClass('active');
+            
+            // Kiểm tra từng link
+            $('.sidebar-menu-link, .sidebar-submenu-link').each(function() {
+                var href = $(this).attr('href');
+                if (href && href !== '#' && href !== 'javascript:void(0);') {
+                    // Lấy path từ href và so sánh với current URL
+                    try {
+                        var linkPath = new URL(href, window.location.origin).pathname.toLowerCase();
+                        if (currentUrl.indexOf(linkPath) !== -1 && linkPath.length > 1) {
+                            $(this).addClass('active');
+                            $(this).closest('.sidebar-menu-item.has-submenu').addClass('active');
+                            activeSet = true;
+                            
+                            // Nếu sidebar đang collapsed khi load trang và có menu item active, mở sidebar ra
+                            if ($('body').hasClass('sidebar-collapsed')) {
+                                $('body').removeClass('sidebar-collapsed');
+                                localStorage.setItem('admin-sidebar-collapsed', 'false');
+                            }
+                            return false; // Dừng vòng lặp khi tìm thấy match
+                        }
+                    } catch(e) {
+                        // Nếu không phải absolute URL, xử lý relative URL
+                        if (href.indexOf('/') === 0 && currentUrl.indexOf(href.toLowerCase()) !== -1) {
+                            $(this).addClass('active');
+                            $(this).closest('.sidebar-menu-item.has-submenu').addClass('active');
+                            activeSet = true;
+                            if ($('body').hasClass('sidebar-collapsed')) {
+                                $('body').removeClass('sidebar-collapsed');
+                                localStorage.setItem('admin-sidebar-collapsed', 'false');
+                            }
+                            return false;
+                        }
+                    }
+                }
+            });
+            
+            // Nếu không tìm thấy link nào match, mặc định set Dashboard là active nếu đang ở trang Home
+            if (!activeSet && (currentUrl.indexOf('/admin/home') !== -1 || currentUrl === '/admin' || currentUrl === '/admin/')) {
+                $('.sidebar-menu-link[href*="Home"]').first().addClass('active');
+            }
+        });
+    </script>
+    
+    <!-- Admin Chat Widget -->
+    @Html.Partial("_AdminChatWidget")
+    
+    @RenderSection("scripts", required: false)
+    
+    <!-- Script để điều chỉnh vị trí các nút chat khi scroll gần copyright-bar -->
+    <script>
+        (function() {
+            var defaultBottom = 20; // Vị trí mặc định từ bottom
+            var buttonHeight = 60; // Chiều cao nút chat
+            var minSpacing = 50; // Khoảng cách tối thiểu với copyright-bar (tăng lên để nhảy cao hơn)
+            
+            function adjustChatButtonsPosition() {
+                // Tìm copyright-bar trong footer
+                var copyrightBar = document.querySelector('.copyright-bar');
+                var aiChatContainer = document.querySelector('#ai-chatbox-container');
+                var adminChatWindow = document.querySelector('#admin-chat-widget-window');
+                
+                var newBottom = defaultBottom;
+                
+                if (copyrightBar) {
+                    var copyrightRect = copyrightBar.getBoundingClientRect();
+                    var windowHeight = window.innerHeight;
+                    
+                    // Nếu copyright-bar đã xuất hiện từ dưới lên (bottom của nó <= windowHeight)
+                    if (copyrightRect.bottom <= windowHeight) {
+                        // Copyright-bar đang trong viewport, tính vị trí tối thiểu cho nút chat
+                        // Để nút chat không bị che, nó phải ở trên copyright-bar
+                        // Vị trí bottom tối thiểu = khoảng cách từ bottom viewport đến top của copyright-bar + spacing lớn hơn
+                        // Thêm chiều cao của copyright-bar để đảm bảo nút chat ở cao hơn hẳn
+                        var copyrightBarHeight = copyrightRect.height;
+                        var minChatBottom = (windowHeight - copyrightRect.bottom) + copyrightBarHeight + minSpacing;
+                        
+                        // Chọn giá trị lớn hơn giữa vị trí mặc định và vị trí tối thiểu
+                        // Điều này đảm bảo nút chat luôn ở trên copyright-bar khi nó xuất hiện
+                        newBottom = Math.max(defaultBottom, minChatBottom);
+                    } else {
+                        // Copyright-bar chưa xuất hiện (ở dưới viewport), giữ nguyên vị trí mặc định
+                        newBottom = defaultBottom;
+                    }
+                }
+                
+                // Điều chỉnh AI Chat button
+                if (aiChatContainer) {
+                    aiChatContainer.style.bottom = newBottom + 'px';
+                    aiChatContainer.style.transition = 'bottom 0.3s ease';
+                }
+                
+                // Điều chỉnh Admin Chat Window (nếu đang mở)
+                if (adminChatWindow && adminChatWindow.style.display !== 'none' && adminChatWindow.style.display !== '') {
+                    // Admin chat window đang mở, điều chỉnh vị trí của nó
+                    var windowBottom = newBottom + buttonHeight + 15; // 15px spacing giữa button và window
+                    adminChatWindow.style.bottom = windowBottom + 'px';
+                    adminChatWindow.style.transition = 'bottom 0.3s ease';
+                }
+            }
+            
+            // Chạy khi scroll (với throttle)
+            var scrollTimeout;
+            window.addEventListener('scroll', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(adjustChatButtonsPosition, 10);
+            }, { passive: true });
+            
+            // Chạy khi resize
+            window.addEventListener('resize', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(adjustChatButtonsPosition, 10);
+            }, { passive: true });
+            
+            // Chạy khi load xong
+            function init() {
+                setTimeout(adjustChatButtonsPosition, 100);
+                
+                // Theo dõi khi admin chat window mở/đóng
+                var adminChatWindow = document.querySelector('#admin-chat-widget-window');
+                if (adminChatWindow) {
+                    var observer = new MutationObserver(function() {
+                        setTimeout(adjustChatButtonsPosition, 50);
+                    });
+                    
+                    observer.observe(adminChatWindow, {
+                        attributes: true,
+                        attributeFilter: ['style']
+                    });
+                    
+                    // Cũng theo dõi khi click vào nút toggle/close
+                    setTimeout(function() {
+                        var closeBtn = document.querySelector('#admin-chat-widget-close');
+                        if (closeBtn) {
+                            closeBtn.addEventListener('click', function() {
+                                setTimeout(adjustChatButtonsPosition, 100);
+                            });
+                        }
+                    }, 500);
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

@@ -1,0 +1,223 @@
+@using WebBanLinhKienDienTu.Utils
+<!-- ============================================================= FOOTER ============================================================= -->
+<footer id="footer" class="footer color-bg" style="background-color: #f8f9fa; margin-top: 40px; padding-top: 50px; padding-bottom: 30px;">
+    <div class="links-social inner-top-sm">
+        <div class="container">
+            <div class="row">
+                <!-- Logo và thông tin công ty -->
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="contact-info">
+                        <div class="footer-logo" style="margin-bottom: 20px;">
+                            <a href="@Url.Action("Index","Home")" style="display: inline-block;">
+                                <img src="@Url.Content("~/Content/images/logo.png")" alt="Logo" style="max-height: 80px; height: auto; width: auto;">
+                            </a>
+                        </div>
+                        <div class="module-body">
+                            <p class="about-us" style="font-size: 14px; color: #000000; margin-bottom: 20px; line-height: 1.6;">
+                                Công ty TNHH một thành viên Minh Tuấn
+                            </p>
+                            <div class="social-icons" style="display: flex; gap: 10px; margin-top: 20px;">
+                                <a href="http://facebook.com/transvelo" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #3b5998; color: white; border-radius: 50%; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-facebook"></i>
+                                </a>
+                                <a href="#" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #1da1f2; color: white; border-radius: 50%; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-twitter"></i>
+                                </a>
+                                <a href="#" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #0077b5; color: white; border-radius: 50%; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-linkedin"></i>
+                                </a>
+                                <a href="#" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #ff6600; color: white; border-radius: 50%; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-rss"></i>
+                                </a>
+                                <a href="#" target="_blank" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; background: #bd081c; color: white; border-radius: 50%; text-decoration: none; transition: all 0.3s;">
+                                    <i class="fa fa-pinterest"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Thông tin liên hệ -->
+                <div class="col-xs-12 col-sm-6 col-md-4">
+                    <div class="contact-information">
+                        <div class="module-heading">
+                            <h4 class="module-title" style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                                Thông tin liên hệ
+                            </h4>
+                        </div>
+                        <div class="module-body">
+                            <ul class="toggle-footer" style="list-style: none; padding: 0;">
+                                <li class="media" style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                                    <div class="pull-left" style="margin-right: 15px;">
+                                        <div style="width: 40px; height: 40px; background: #D70018; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-map-marker" style="color: white; font-size: 18px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="media-body" style="flex: 1;">
+                                        <p style="margin: 0; color: #000000; font-size: 14px; line-height: 1.6;">
+                                            <strong style="color: rgb(0, 0, 0);">Địa chỉ:</strong><br>
+                                            105C3 Nghĩa tân, cầu giấy, hà nội
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="media" style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                                    <div class="pull-left" style="margin-right: 15px;">
+                                        <div style="width: 40px; height: 40px; background: #D70018; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-phone" style="color: white; font-size: 18px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="media-body" style="flex: 1;">
+                                        <p style="margin: 0; color: #666; font-size: 14px; line-height: 1.6;">
+                                            <strong style="color: #333;">Điện thoại:</strong><br>
+                                            <a href="tel:0396041108" style="color: #000000; text-decoration: none;">0396041108</a>
+                                        </p>
+                                    </div>
+                                </li>
+                                <li class="media" style="margin-bottom: 20px; display: flex; align-items: flex-start;">
+                                    <div class="pull-left" style="margin-right: 15px;">
+                                        <div style="width: 40px; height: 40px; background: #D70018; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                            <i class="fa fa-envelope" style="color: white; font-size: 18px;"></i>
+                                        </div>
+                                    </div>
+                                    <div class="media-body" style="flex: 1;">
+                                        <p style="margin: 0; color: #000000; font-size: 14px; line-height: 1.6;">
+                                            <strong style="color: #000000;">Email:</strong><br>
+                                            <a href="mailto:minhtuann914@gmail.com" style="color: #000000; text-decoration: none;">minhtuann914@gmail.com</a>
+                                        </p>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Google Map -->
+                <div class="col-xs-12 col-sm-12 col-md-4">
+                    <div class="module-heading">
+                        <h4 class="module-title" style="font-size: 18px; font-weight: bold; color: #333; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.5px;">
+                            Bản đồ
+                        </h4>
+                    </div>
+                    <div class="module-body">
+                        <div style="width: 100%; height: 300px; border-radius: 8px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.15); border: 1px solid #e0e0e0; position: relative;">
+                            <iframe 
+                                width="100%" 
+                                height="300" 
+                                frameborder="0" 
+                                style="border:0" 
+                                src="https://maps.google.com/maps?q=105C3+Nghĩa+tân,+Cầu+Giấy,+Hà+Nội&t=&z=16&ie=UTF8&iwloc=&output=embed" 
+                                allowfullscreen 
+                                loading="lazy" 
+                                referrerpolicy="no-referrer-when-downgrade">
+                            </iframe>
+                        </div>
+                        <div style="margin-top: 15px; padding: 12px; background: #f8f9fa; border-radius: 6px; border-left: 3px solid #D70018;">
+                            <p style="margin: 0 0 8px 0; font-size: 13px; color: #666; font-weight: bold;">
+                                <i class="fa fa-map-marker" style="color: #D70018; margin-right: 5px;"></i>
+                                Địa chỉ:
+                            </p>
+                            <p style="margin: 0; font-size: 14px; color: #333; line-height: 1.5;">
+                                105C3 Nghĩa tân, cầu giấy, hà nội
+                            </p>
+                        </div>
+                        <p style="margin-top: 15px; font-size: 13px; color: #666;">
+                            <a href="https://www.google.com/maps/search/?api=1&query=105C3+Nghĩa+tân,+Cầu+Giấy,+Hà+Nội,+Việt+Nam" target="_blank" style="color: #D70018; text-decoration: none; display: inline-flex; align-items: center; gap: 5px; font-weight: 500;">
+                                <i class="fa fa-external-link"></i> 
+                                <span>Xem trên Google Maps</span>
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div><!-- /.row -->
+        </div><!-- /.container -->
+    </div><!-- /.links-social -->
+    
+    <!-- Copyright Bar -->
+    <div class="copyright-bar" style="background: linear-gradient(135deg, #D70018 0%, #b80015 100%); color: #ffffff; padding: 25px 0; margin-top: 40px; box-shadow: 0 -2px 10px rgba(0,0,0,0.1);">
+        <div class="container">
+            <div class="row" style="align-items: center;">
+                <div class="col-xs-12 col-sm-6" style="margin-bottom: 15px;">
+                    <div class="copyright" style="font-size: 14px; line-height: 1.8; color: #ffffff;">
+                        <i class="fa fa-copyright" style="margin-right: 5px;"></i>
+                        <span>2025 - Bản quyền của</span>
+                        <a href="@Url.Action("Index", "Home")" style="color: #ffffff; text-decoration: none; font-weight: bold; margin-left: 5px; transition: all 0.3s ease; border-bottom: 1px solid transparent;" onmouseover="this.style.borderBottomColor='#ffffff'; this.style.opacity='0.9'" onmouseout="this.style.borderBottomColor='transparent'; this.style.opacity='1'">
+                            Công Ty TNHH một thành viên Minh Tuấn
+                        </a>
+                    </div>
+                </div>
+                <div class="col-xs-12 col-sm-6">
+                    <div class="clearfix payment-methods" style="text-align: right;">
+                        <ul style="list-style: none; padding: 0; margin: 0; display: inline-flex; gap: 10px; flex-wrap: wrap; justify-content: flex-end; align-items: center;">
+                            <li style="display: inline-block;">
+                                <img src="@AssetUtil.ResourceUrl("images/payments/1.png")" alt="Payment" style="height: 32px; width: auto; opacity: 0.9; transition: all 0.3s ease; filter: brightness(1.1);" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.filter='brightness(1.2)'" onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1)'; this.style.filter='brightness(1.1)'">
+                            </li>
+                            <li style="display: inline-block;">
+                                <img src="@AssetUtil.ResourceUrl("images/payments/2.png")" alt="Payment" style="height: 32px; width: auto; opacity: 0.9; transition: all 0.3s ease; filter: brightness(1.1);" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.filter='brightness(1.2)'" onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1)'; this.style.filter='brightness(1.1)'">
+                            </li>
+                            <li style="display: inline-block;">
+                                <img src="@AssetUtil.ResourceUrl("images/payments/3.png")" alt="Payment" style="height: 32px; width: auto; opacity: 0.9; transition: all 0.3s ease; filter: brightness(1.1);" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.filter='brightness(1.2)'" onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1)'; this.style.filter='brightness(1.1)'">
+                            </li>
+                            <li style="display: inline-block;">
+                                <img src="@AssetUtil.ResourceUrl("images/payments/4.png")" alt="Payment" style="height: 32px; width: auto; opacity: 0.9; transition: all 0.3s ease; filter: brightness(1.1);" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.filter='brightness(1.2)'" onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1)'; this.style.filter='brightness(1.1)'">
+                            </li>
+                            <li style="display: inline-block;">
+                                <img src="@AssetUtil.ResourceUrl("images/payments/5.png")" alt="Payment" style="height: 32px; width: auto; opacity: 0.9; transition: all 0.3s ease; filter: brightness(1.1);" onmouseover="this.style.opacity='1'; this.style.transform='scale(1.1)'; this.style.filter='brightness(1.2)'" onmouseout="this.style.opacity='0.9'; this.style.transform='scale(1)'; this.style.filter='brightness(1.1)'">
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</footer>
+<!-- ============================================================= FOOTER : END============================================================= -->
+
+<style>
+    /* Footer Social Icons Hover Effect */
+    .footer .social-icons a:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+    
+    /* Footer Contact Info Hover */
+    .footer .contact-information a:hover {
+        text-decoration: underline !important;
+    }
+    
+    /* Copyright Bar Styling */
+    .footer .copyright-bar {
+        background: linear-gradient(135deg, #D70018 0%, #b80015 100%) !important;
+    }
+    
+    .footer .copyright-bar .copyright {
+        color: #ffffff !important;
+    }
+    
+    .footer .copyright-bar .copyright a {
+        color: #ffffff !important;
+    }
+    
+    .footer .copyright-bar .payment-methods img {
+        filter: brightness(1.1);
+    }
+    
+    /* Responsive adjustments */
+    @@media (max-width: 768px) {
+        .footer .module-heading h4 {
+            margin-top: 30px;
+        }
+        
+        .footer .copyright-bar .payment-methods ul {
+            justify-content: center !important;
+            margin-top: 15px;
+        }
+        
+        .footer .copyright-bar .copyright {
+            text-align: center !important;
+        }
+        
+        .footer .copyright-bar .payment-methods {
+            text-align: center !important;
+        }
+    }
+</style>

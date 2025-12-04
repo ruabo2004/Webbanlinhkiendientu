@@ -1,0 +1,21 @@
+[
+  { "district_id": 101, "district_name": "Ba Đình", "district_type": "Quận", "province_id": 1 },
+  { "district_id": 102, "district_name": "Hoàn Kiếm", "district_type": "Quận", "province_id": 1 },
+  { "district_id": 103, "district_name": "Tây Hồ", "district_type": "Quận", "province_id": 1 },
+
+  { "district_id": 201, "district_name": "Quận 1", "district_type": "Quận", "province_id": 2 },
+  { "district_id": 202, "district_name": "Quận 3", "district_type": "Quận", "province_id": 2 },
+  { "district_id": 203, "district_name": "Quận 5", "district_type": "Quận", "province_id": 2 },
+
+  { "district_id": 301, "district_name": "Hải Châu", "district_type": "Quận", "province_id": 3 },
+  { "district_id": 302, "district_name": "Sơn Trà", "district_type": "Quận", "province_id": 3 },
+  { "district_id": 303, "district_name": "Ngũ Hành Sơn", "district_type": "Quận", "province_id": 3 },
+
+  { "district_id": 401, "district_name": "Hồng Bàng", "district_type": "Quận", "province_id": 4 },
+  { "district_id": 402, "district_name": "Ngô Quyền", "district_type": "Quận", "province_id": 4 },
+  { "district_id": 403, "district_name": "Lê Chân", "district_type": "Quận", "province_id": 4 },  
+
+  { "district_id": 501, "district_name": "Ninh Kiều", "district_type": "Quận", "province_id": 5 },
+  { "district_id": 502, "district_name": "Bình Thủy", "district_type": "Quận", "province_id": 5 },
+  { "district_id": 503, "district_name": "Cái Răng", "district_type": "Quận", "province_id": 5 }
+]

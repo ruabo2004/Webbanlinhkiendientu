@@ -1,0 +1,309 @@
+﻿@{
+    ViewBag.Title = "Trang chủ";
+}
+
+<div class="body-content outer-top-xs" id="top-banner-and-menu">
+    <div class="container" style="background-color: white; padding: 20px; border-radius: 8px; margin-top: 20px; margin-bottom: 20px;">
+        <div class="row">
+            <!-- ============================================== SIDEBAR ============================================== -->
+            <div class="col-xs-12 col-sm-12 col-md-3 sidebar">
+
+                <!-- ================================== TOP NAVIGATION ================================== -->
+                @Html.Action("SideBarMenu")
+                <!-- ================================== TOP NAVIGATION : END ================================== -->
+                <!-- ============================================== New Product ============================================== -->
+                @Html.Action("LatestProduct","Widget")
+                <!-- ============================================== New Product : END ============================================== -->
+               <!-- ============================================== COLOR============================================== -->
+                <div class="sidebar-widget  wow fadeInUp outer-bottom-xs ">
+                    <div id="advertisement" class="advertisement">
+                        @* <div class="item bg-color"> *@
+                        @*     <div class="container-fluid"> *@
+                        @*         <div class="caption vertical-top text-left"> *@
+                        @*             <div class="big-text"> *@
+                        @*                 Save<span class="big">50%</span> *@
+                        @*             </div> *@
+                        @*          *@
+                        @*             <div class="excerpt"> *@
+                        @*                 on selected items *@
+                        @*             </div> *@
+                        @*         </div><!-- /.caption --> *@
+                        @*     </div><!-- /.container-fluid --> *@
+                        @* </div><!-- /.item --> *@
+                        @* <div class="item" style="background-image: url('~/Content/images/advertisement/1.jpg');"> *@
+                        @* <div class="item" style="background-image: url('@Url.Content("~/Content/images/advertisement/1.jpg")');"> *@
+                        @* </div><!-- /.item --> *@
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/banners/banner-side.png")');">
+                        </div><!-- /.item -->
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/advertisement/7.jpg")');">
+                        </div><!-- /.item -->
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/advertisement/8.jpg")');">
+                        </div><!-- /.item -->
+                        @* <div class="item bg-color"> *@
+                        @*     <div class="container-fluid"> *@
+                        @*         <div class="caption vertical-top text-left"> *@
+                        @*             <div class="big-text"> *@
+                        @*                 Save<span class="big">50%</span> *@
+                        @*             </div> *@
+                        @* *@
+                        @*             <div class="excerpt fadeInDown-2"> *@
+                        @*                 on selected items *@
+                        @*             </div> *@
+                        @*         </div><!-- /.caption --> *@
+                        @*     </div><!-- /.container-fluid --> *@
+                        @* </div><!-- /.item --> *@
+                    </div><!-- /.owl-carousel -->
+                </div>
+
+                <!-- ============================================== COLOR: END ============================================== -->
+
+            </div><!-- /.sidemenu-holder -->
+            @* <div class="col-md-12 col-xs-12 col-md-1-sidebar"> *@
+            @*     <img src="~/Content/images/baolixi.png" style="width: 8%; height: auto;" /> *@
+            @* </div> *@
+            <!-- ============================================== SIDEBAR : END ============================================== -->
+            <!-- ============================================== CONTENT ============================================== -->
+            <div class="col-xs-12 col-sm-12 col-md-9 homebanner-holder" style="background-color: white; border-radius: 10px;">
+                <!-- ========================================== SECTION – HERO ========================================= -->
+
+                <div id="hero">
+                    <div id="owl-main" class="owl-carousel owl-inner-nav owl-ui-sm">
+
+                        @* <div class="item" style="background-image: url('https://tala.tikicdn.com/ts/banner/eb/12/ca/eb12cae6625d7cd9e7e8f53f0b0b2c42.jpg');"> *@
+                        @* </div><!-- /.item --> *@
+                        @* *@
+                        @* <div class="item" style="background-image: url('https://tala.tikicdn.com/ts/banner/c5/26/b9/c526b9c132c3e71cf8f4f6c814665de6.jpg');"> *@
+                        @* </div><!-- /.item --> *@
+                        @* *@
+                        @* <div class="item" style="background-image: url('https://tala.tikicdn.com/ts/banner/fc/22/c4/fc22c42b72ae0769ad22d69316519ca0.jpg');"> *@
+                        @* </div><!-- /.item --> *@
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/brands/brand7.png")'); width: 935px; height: 528px;">
+                        </div>
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/brands/brand8.png")'); width: 935px; height: 528px;">
+                        </div>
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/brands/brand9.png")'); width: 935px; height: 528px;">
+                        </div>
+                        <div class="item" style="background-image: url('@Url.Content("~/Content/images/brands/brand10.png")'); width: 935px; height: 528px;">
+                        </div>
+                        
+                    </div><!-- /.owl-carousel -->
+                </div>
+
+                @* <!-- ========================================= SECTION – HERO : END ========================================= -->
+                <!-- ============================================== INFO BOXES ============================================== -->
+                <div class="info-boxes wow fadeInUp">
+                    <div class="info-boxes-inner">
+                        <div class="row">
+                            <div class="col-md-6 col-sm-4 col-lg-4">
+                                <div class="info-box">
+                                    <div class="row">
+                                        <div class="col-xs-2">
+                                            <i class="icon fa fa-dollar"></i>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <h4 class="info-box-heading green">Đổi trả</h4>
+                                        </div>
+                                    </div>
+                                    <h6 class="text">Đổi trả sản phẩm trong vòng 30 ngày</h6>
+                                </div>
+                            </div><!-- .col -->
+                            <div class="hidden-md col-sm-4 col-lg-4">
+                                <div class="info-box">
+                                    <div class="row">
+                                        <div class="col-xs-2">
+                                            <i class="icon fa fa-truck"></i>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <h4 class="info-box-heading orange">free shipping</h4>
+                                        </div>
+                                    </div>
+                                    <h6 class="text">Free Ship cho đơn hàng trên 300.000đ</h6>
+                                </div>
+                            </div><!-- .col -->
+                            <div class="col-md-6 col-sm-4 col-lg-4">
+                                <div class="info-box">
+                                    <div class="row">
+                                        <div class="col-xs-2">
+                                            <i class="icon fa fa-gift"></i>
+                                        </div>
+                                        <div class="col-xs-10">
+                                            <h4 class="info-box-heading red">Giảm giá sốc</h4>
+                                        </div>
+                                    </div>
+                                    <h6 class="text">Nhiều đợt giảm giá các mặt hàng hot</h6>
+                                </div>
+                            </div><!-- .col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.info-boxes-inner -->
+
+                </div><!-- /.info-boxes --> *@
+                <!-- ============================================== INFO BOXES : END ============================================== -->
+                <!-- ============================================== SCROLL TABS ============================================== -->
+                <div id="product-tabs-slider" class="scroll-tabs outer-top-vs wow fadeInUp" style="margin-top: 200px;">
+                    <div class="more-info-tab clearfix ">
+                        <h3 class="new-product-title pull-left">Sản phẩm mới</h3>
+                    </div>
+                    <div class="tab-content outer-top-xs">
+                        <div class="tab-pane in active" id="all">
+                            <div class="product-slider">
+                                <div class="owl-carousel home-owl-carousel custom-carousel owl-theme" data-item="4">
+                                    @foreach (Product product in Model.NewProduct)
+                                    {
+                                        <div class="item item-carousel">
+                                        <div class="products">
+
+                                            <div class="product">
+                                                <div class="product-image">
+                                                    <div class="image">
+                                                        <a href="@Url.Action("Detail", "Product", new { id = product.ProductID})">
+                                                            @{
+                                                                var imgUrl = ImageHelper.DefaultImage();
+                                                                if (product.ImageProducts.Count > 0)
+                                                                {
+                                                                    imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                                                }
+                                                                imgUrl += "?w=195&h=250";
+                                                            }
+                                                            <img src="@Url.Content("~/Content/images/blank.gif")" data-echo="@Url.Content(imgUrl)" alt="">
+                                                        </a>
+                                                    </div><!-- /.image -->
+                                                    <div class="tag new"><span>new</span></div>
+                                                </div><!-- /.product-image -->
+
+                                                <div class="product-info text-left">
+                                                    <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID},null)">@product.ProductName</a></h3>
+                                                    <div class="rating rateit-small" data-rateit-value="@product.AverageRating().ToString("0.0", System.Globalization.CultureInfo.InvariantCulture)" data-rateit-readonly="true"></div>
+                                                    <div class="description"></div>
+                                                    <div class="product-price">
+                                                        <span class="price">
+                                                            @if (product.isSale())
+                                                            {
+                                                                @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                                            }
+                                                            else
+                                                            {
+                                                                @Html.FormatCurrency(product.Price) <span>đ</span>
+                                                            }
+                                                        </span>
+                                                        @if (product.isSale())
+                                                        {
+                                                            <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                                        }
+
+                                                    </div>
+
+                                                </div><!-- /.product-info -->
+                                                <div class="cart clearfix animate-effect">
+                                                    <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                        <span class="btn-label"><i class="fa fa-shopping-cart add-cart"></i></span>Thêm giỏ hàng
+                                                    </a>
+                                                </div><!-- /.cart -->
+                                            </div><!-- /.product -->
+
+                                        </div><!-- /.products -->
+                                    </div><!-- /.item -->
+                                    }
+                                </div><!-- /.home-owl-carousel -->
+                            </div><!-- /.product-slider -->
+                        </div><!-- /.tab-pane -->
+                        @* Removed hardcoded tabs: smartphone, laptop, apple *@
+                    </div><!-- /.tab-content -->
+                </div><!-- /.scroll-tabs -->
+                <!-- ============================================== SCROLL TABS : END ============================================== -->
+                <!-- ============================================== GROUP PRODUCTS ============================================== -->
+                <div id="group-products-container">
+                    @{
+                        List<GroupProduct> allGroups = Model.GroupProducts as List<GroupProduct> ?? new List<GroupProduct>();
+                        var initialGroups = allGroups.Take(2).ToList();
+                        var remainingGroups = allGroups.Skip(2).ToList();
+                    }
+                    
+                    @* Hiển thị 2 nhóm đầu tiên *@
+                    @foreach (GroupProduct group in initialGroups)
+                {
+                    @Html.Action("ShowGroupItem", new { id=group.GroupID })
+                }
+                    
+                    @* Ẩn các nhóm còn lại *@
+                    <div id="remaining-groups" style="display: none;">
+                        @foreach (GroupProduct group in remainingGroups)
+                        {
+                            @Html.Action("ShowGroupItem", new { id=group.GroupID })
+                        }
+                    </div>
+                    
+                    @* Nút "Xem thêm" *@
+                    @if (remainingGroups.Any())
+                    {
+                        <div class="load-more-container text-center m-t-30">
+                            <a href="#" id="btn-load-more-groups" class="btn btn-default btn-load-more">
+                                Xem thêm <strong>@remainingGroups.Count()</strong> danh mục <span class="caret"></span>
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <!-- ============================================== GROUP PRODUCTS : END ============================================== -->
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container -->
+</div><!-- /#top-banner-and-menu -->
+
+@section Scripts {
+<style>
+    .load-more-container .btn-load-more {
+        min-width: 260px;
+        border-radius: 999px;
+        border: 1px solid #dcdcdc;
+        background-color: #fff;
+        padding: 12px 24px;
+        font-weight: 600;
+        color: #333;
+        display: inline-block;
+    }
+    .load-more-container .btn-load-more:hover {
+        border-color: #aaa;
+        color: #111;
+    }
+</style>
+<script>
+    $(document).ready(function() {
+        var $loadMoreGroups = $('#btn-load-more-groups');
+        if ($loadMoreGroups.length) {
+            $loadMoreGroups.on('click', function (e) {
+                e.preventDefault();
+                var $remaining = $('#remaining-groups');
+                if ($remaining.length === 0) return;
+                $remaining.stop(true, true).slideDown(400);
+                $(this).closest('.load-more-container').fadeOut(200, function () {
+                    $(this).remove();
+                });
+            });
+        }
+    });
+</script>
+}
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" data-backdrop="false" role="dialog">
+    <div class="modal-dialog" style="width:300px;">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chọn màu sắc</h4>
+            </div>
+            <div class="modal-body" style="text-align:center">
+                <select class="form-control" id="list_color">
+                </select>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_add" type="button" class="btn btn-success" data-dismiss="modal">Thêm vào giỏ</button>
+                <button id="btn_cancel" type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+

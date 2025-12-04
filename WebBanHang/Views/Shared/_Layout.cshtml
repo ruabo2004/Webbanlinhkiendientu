@@ -1,0 +1,360 @@
+﻿@{
+    var Data = ViewBag.Data;
+    var config = Data.Config as DefaultableDictionary<String, String>;
+    var serverProvinceCount = 0;
+    try
+    {
+        var provList = ViewData["Provinces"] as List<WebBanLinhKienDienTu.Models.Province>;
+        if (provList != null)
+        {
+            serverProvinceCount = provList.Count;
+        }
+    }
+    catch
+    {
+        serverProvinceCount = -1;
+    }
+}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <meta name="keywords" content="MediaCenter, Template, eCommerce">
+    <meta name="robots" content="all">
+    <title>@config["site_title"] - @ViewBag.Title</title>
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="~/Content/css/bootstrap.min.css">
+
+    <!-- Customizable CSS -->
+    <link rel="stylesheet" href="~/Content/css/main.css">
+    <link rel="stylesheet" href="~/Content/css/spaces-utils.css">
+    <link rel="stylesheet" href="~/Content/css/green.css">
+    <link rel="stylesheet" href="~/Content/css/owl.carousel.css">
+    <link rel="stylesheet" href="~/Content/css/owl.transitions.css">
+    <!--<link rel="stylesheet" href="~/Content/css/owl.theme.css">-->
+    <link href="~/Content/css/lightbox.css" rel="stylesheet">
+    <link rel="stylesheet" href="~/Content/css/animate.min.css">
+    <link rel="stylesheet" href="~/Content/css/rateit.css">
+    <link rel="stylesheet" href="~/Content/css/bootstrap-select.min.css">
+    <!-- Demo Purpose Only. Should be removed in production -->
+    <link rel="stylesheet" href="~/Content/css/config.css">
+    <link href="~/Content/css/green.css" rel="alternate stylesheet" title="Green color">
+    <link href="~/Content/css/blue.css" rel="alternate stylesheet" title="Blue color">
+    <link href="~/Content/css/red.css" rel="alternate stylesheet" title="Red color">
+    <link href="~/Content/css/orange.css" rel="alternate stylesheet" title="Orange color">
+    <link href="~/Content/css/dark-green.css" rel="alternate stylesheet" title="Darkgreen color">
+    <link href="https://stevenbenner.github.io/jquery-powertip/styles/jquery.powertip.css" rel="alternate stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300,700" rel="stylesheet">
+    <!-- Demo Purpose Only. Should be removed in production : END -->
+    <!-- Icons/Glyphs -->
+    <link rel="stylesheet" href="~/Content/css/font-awesome.min.css">
+    <!-- Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,700' rel='stylesheet' type='text/css'>
+
+    <!-- smallipop CSS: use CDN, include local only if exists to avoid 404 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/andretw/smallipop@master/jquery.smallipop.min.css" type="text/css" media="all" title="Screen" />
+    @if (System.IO.File.Exists(Server.MapPath("~/Content/css/jquery.smallipop.min.css"))) {
+        <link rel="stylesheet" href="@Url.Content("~/Content/css/jquery.smallipop.min.css")" type="text/css" media="all" title="Screen" />
+    }
+
+    <!-- Favicon -->
+    <link rel="shortcut icon" href="~/Content/images/favicon.ico">
+    <link rel="stylesheet" href="~/Content/css/bootstrap-msg.min.css">
+    <!-- HTML5 elements and media queries Support for IE8 : HTML5 shim and Respond.js -->
+    <!--[if lt IE 9]>
+        <script src="~/Content/js/html5shiv.js"></script>
+        <script src="~/Content/js/respond.min.js"></script>
+    <![endif]-->
+    <script src="~/Content/js/jquery-1.11.1.min.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+    <script src="~/Content/js/bootstrap.min.js"></script>
+
+    <script src="~/Content/js/bootstrap-hover-dropdown.min.js"></script>
+    <script src="~/Content/js/owl.carousel.min.js"></script>
+
+    <script src="~/Content/js/echo.min.js"></script>
+    <script src="~/Content/js/jquery.easing-1.3.min.js"></script>
+    <script src="~/Content/js/bootstrap-slider.min.js"></script>
+    <script src="~/Content/js/jquery.rateit.min.js"></script>
+    <script type="text/javascript" src="~/Content/js/lightbox.min.js"></script>
+    <script src="~/Content/js/bootstrap-select.min.js"></script>
+    <script src="~/Content/js/wow.min.js"></script>
+
+    <!-- modernizr: use CDN -->
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/modernizr/2.8.3/modernizr.min.js"></script>
+    @if (System.IO.File.Exists(Server.MapPath("~/Content/js/modernizr.js"))) {
+        <script type="text/javascript" src="@Url.Content("~/Content/js/modernizr.js")"></script>
+    }
+
+    <!-- smallipop JS: use CDN and include local only if exists -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/gh/andretw/smallipop@master/jquery.smallipop.min.js"></script>
+    @if (System.IO.File.Exists(Server.MapPath("~/Content/js/jquery.smallipop.min.js"))) {
+        <script type="text/javascript" src="@Url.Content("~/Content/js/jquery.smallipop.min.js")"></script>
+    }
+
+    <script type="text/javascript" src="~/Content/js/bootstrap-msg.min.js"></script>
+    <script type="text/javascript" src="~/Content/js/bootbox.min.js"></script>
+    
+    @* SEO Meta Tags & Schema.org *@
+    @RenderSection("MetaTags", required: false)
+</head>
+<body class="cnt-home" style="background-color: #f5f5f5;">
+<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: #f5f5f5; z-index: -1;"></div>
+
+    @Html.Partial("_Header")
+    @RenderBody()
+    @Html.Partial("_Footer")
+    <!-- JavaScripts placed at the end of the document so the pages load faster -->
+
+    <script src="~/Content/js/scripts.js"></script>
+    @RenderSection("masterjs", required: false)
+    @RenderSection("Scripts", required: false)
+
+    <script>
+        // server-side debug value
+        console && console.log && console.log('serverProvinceCount (from server ViewData["Provinces"]):', @serverProvinceCount);
+    </script>
+
+    <script>
+        // If province dropdowns are empty on render, fetch provinces via API and populate.
+        (function () {
+            function ensureProvinces() {
+                try {
+                    console && console.log && console.log('ensureProvinces called');
+                    var $prov = $('#drop-province');
+                    if ($prov.length) console && console.log && console.log('drop-province exists, option count=', $prov.find('option').length);
+                    if ($prov.length && $prov.find('option').length <= 1) {
+                        console && console.log && console.log('calling /AppApi/Province');
+                        $.getJSON('/AppApi/Province', function (data) {
+                            console && console.log && console.log('/AppApi/Province response', data);
+                            if (data && data.status === 'ok' && data.provices) {
+                                $.each(data.provices, function (i, item) {
+                                    $prov.append('<option value="' + item.province_id + '">' + (item.province_type ? item.province_type + ' ' : '') + item.province_name + '</option>');
+                                });
+                                console && console.log && console.log('appended provinces, new count=', $prov.find('option').length);
+                            }
+                        }).fail(function(jqxhr, textStatus, error) {
+                            console && console.error && console.error('getJSON /AppApi/Province failed', textStatus, error, jqxhr.responseText);
+                        });
+                    }
+                } catch (e) {
+                    console && console.log && console.log('ensureProvinces error', e);
+                }
+            }
+
+            // Run on DOM ready
+            if (document.readyState === 'complete' || document.readyState === 'interactive') {
+                ensureProvinces();
+            } else {
+                document.addEventListener('DOMContentLoaded', ensureProvinces);
+            }
+        })();
+
+        // Global AJAX error logger to help debug missing API/static files
+        $(document).ajaxError(function (event, jqxhr, settings, thrownError) {
+            try {
+                console && console.error && console.error('AJAX error: ', settings.url, jqxhr.status, thrownError, jqxhr.responseText);
+            } catch (e) { }
+        });
+
+        // Robust delegated handler for address dropdowns (supports selects by id or name)
+        $(document).on('change', '.address-choose', function () {
+            var $el = $(this);
+            var idAttr = $el.attr('id') || $el.attr('name') || '';
+            var val = $el.val();
+
+            // determine which targets to update
+            var $dropDistrict = $();
+            var $dropWard = $();
+
+            if (idAttr === 'drop-province' || idAttr === 'ProvinceID') {
+                $dropDistrict = $('#drop-district').length ? $('#drop-district') : $('select[name=DistrictID]');
+                $dropWard = $('#drop-ward').length ? $('#drop-ward') : $('select[name=WardID]');
+
+                $dropDistrict.html('<option value="">Xin vui lòng chọn Quận/Huyện</option>');
+                $dropWard.html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+
+                if (!val) return;
+
+                $.ajax({
+                    url: '/AppApi/District_In_Province',
+                    method: 'GET',
+                    data: { id: val },
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data && data.status === 'ok' && data.districts) {
+                        $.each(data.districts, function (i, item) {
+                            var option = '<option value="' + item.district_id + '">' + (item.district_type ? item.district_type + ' ' : '') + item.district_name + '</option>';
+                            $dropDistrict.append(option);
+                        });
+                        $dropDistrict.trigger('change');
+                    } else {
+                        console && console.warn && console.warn('District_In_Province returned error or empty', data);
+                    }
+                }).fail(function (jqxhr, textStatus, err) {
+                    console && console.error && console.error('AJAX fail District_In_Province', textStatus, err, jqxhr.responseText);
+                });
+            } else if (idAttr === 'drop-district' || idAttr === 'DistrictID') {
+                $dropWard = $('#drop-ward').length ? $('#drop-ward') : $('select[name=WardID]');
+                $dropWard.html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+                if (!val) return;
+
+                $.ajax({
+                    url: '/AppApi/Ward_In_District',
+                    method: 'GET',
+                    data: { id: val },
+                    dataType: 'json'
+                }).done(function (data) {
+                    if (data && data.status === 'ok' && data.wards) {
+                        $.each(data.wards, function (i, item) {
+                            var option = '<option value="' + item.ward_id + '">' + (item.ward_type ? item.ward_type + ' ' : '') + item.ward_name + '</option>';
+                            $dropWard.append(option);
+                        });
+                    } else {
+                        console && console.warn && console.warn('Ward_In_District returned error or empty', data);
+                    }
+                }).fail(function (jqxhr, textStatus, err) {
+                    console && console.error && console.error('AJAX fail Ward_In_District', textStatus, err, jqxhr.responseText);
+                });
+            }
+        });
+    </script>
+
+    <script>
+        $('.search-panel ul.dropdown-menu a').click(function (e) {
+            e.preventDefault();
+            $(this).parents().eq(2).find('button.dropdown-toggle').html($(this).text() + ' <span class="caret"></span>');
+            $(this).parents().eq(2).find('#group').val($(this).data('id'));
+        });
+    </script>
+
+    @* AI Chatbot Widget *@
+    @Html.Partial("_AiChatbox")
+    
+    @* Admin Chat Widget *@
+    @Html.Partial("_AdminChatbox")
+    
+    <!-- Script để điều chỉnh vị trí các nút chat khi scroll gần copyright-bar -->
+    <script>
+        (function() {
+            var defaultBottom = 20; // Vị trí mặc định từ bottom
+            var buttonHeight = 60; // Chiều cao nút chat
+            var minSpacing = 50; // Khoảng cách tối thiểu với copyright-bar (tăng lên để nhảy cao hơn)
+            
+            function adjustChatButtonsPosition() {
+                // Tìm copyright-bar trong footer
+                var copyrightBar = document.querySelector('.copyright-bar');
+                var aiChatContainer = document.querySelector('#ai-chatbox-container');
+                var adminChatContainer = document.querySelector('.admin-chatbox-container');
+                var aiChatWindow = document.querySelector('#ai-chat-window');
+                var adminChatWindow = document.querySelector('.admin-chat-window');
+                
+                var newBottom = defaultBottom;
+                
+                if (copyrightBar) {
+                    var copyrightRect = copyrightBar.getBoundingClientRect();
+                    var windowHeight = window.innerHeight;
+                    
+                    // Nếu copyright-bar đã xuất hiện từ dưới lên (bottom của nó <= windowHeight)
+                    if (copyrightRect.bottom <= windowHeight) {
+                        // Copyright-bar đang trong viewport, tính vị trí tối thiểu cho nút chat
+                        // Để nút chat không bị che, nó phải ở trên copyright-bar
+                        // Vị trí bottom tối thiểu = khoảng cách từ bottom viewport đến top của copyright-bar + spacing lớn hơn
+                        // Thêm chiều cao của copyright-bar để đảm bảo nút chat ở cao hơn hẳn
+                        var copyrightBarHeight = copyrightRect.height;
+                        var minChatBottom = (windowHeight - copyrightRect.bottom) + copyrightBarHeight + minSpacing;
+                        
+                        // Chọn giá trị lớn hơn giữa vị trí mặc định và vị trí tối thiểu
+                        // Điều này đảm bảo nút chat luôn ở trên copyright-bar khi nó xuất hiện
+                        newBottom = Math.max(defaultBottom, minChatBottom);
+                    } else {
+                        // Copyright-bar chưa xuất hiện (ở dưới viewport), giữ nguyên vị trí mặc định
+                        newBottom = defaultBottom;
+                    }
+                }
+                
+                // Điều chỉnh AI Chat button
+                if (aiChatContainer) {
+                    aiChatContainer.style.bottom = newBottom + 'px';
+                    aiChatContainer.style.transition = 'bottom 0.3s ease';
+                }
+                
+                // Điều chỉnh Admin Chat button (nếu có)
+                if (adminChatContainer) {
+                    adminChatContainer.style.bottom = newBottom + 'px';
+                    adminChatContainer.style.transition = 'bottom 0.3s ease';
+                }
+                
+                // Điều chỉnh AI Chat Window (nếu đang mở)
+                if (aiChatWindow && aiChatWindow.style.display !== 'none' && aiChatWindow.style.display !== '') {
+                    var windowBottom = newBottom + buttonHeight + 15;
+                    aiChatWindow.style.bottom = windowBottom + 'px';
+                    aiChatWindow.style.transition = 'bottom 0.3s ease';
+                }
+                
+                // Điều chỉnh Admin Chat Window (nếu đang mở)
+                if (adminChatWindow && adminChatWindow.style.display !== 'none' && adminChatWindow.style.display !== '') {
+                    var windowBottom = newBottom + buttonHeight + 15;
+                    adminChatWindow.style.bottom = windowBottom + 'px';
+                    adminChatWindow.style.transition = 'bottom 0.3s ease';
+                }
+            }
+            
+            // Chạy khi scroll (với throttle)
+            var scrollTimeout;
+            window.addEventListener('scroll', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(adjustChatButtonsPosition, 10);
+            }, { passive: true });
+            
+            // Chạy khi resize
+            window.addEventListener('resize', function() {
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(adjustChatButtonsPosition, 10);
+            }, { passive: true });
+            
+            // Chạy khi load xong
+            function init() {
+                setTimeout(adjustChatButtonsPosition, 100);
+                
+                // Theo dõi khi chat window mở/đóng
+                var aiChatWindow = document.querySelector('#ai-chat-window');
+                var adminChatWindow = document.querySelector('.admin-chat-window');
+                
+                if (aiChatWindow) {
+                    var observer = new MutationObserver(function() {
+                        setTimeout(adjustChatButtonsPosition, 50);
+                    });
+                    
+                    observer.observe(aiChatWindow, {
+                        attributes: true,
+                        attributeFilter: ['style']
+                    });
+                }
+                
+                if (adminChatWindow) {
+                    var observer2 = new MutationObserver(function() {
+                        setTimeout(adjustChatButtonsPosition, 50);
+                    });
+                    
+                    observer2.observe(adminChatWindow, {
+                        attributes: true,
+                        attributeFilter: ['style']
+                    });
+                }
+            }
+            
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', init);
+            } else {
+                init();
+            }
+        })();
+    </script>
+</body>
+</html>

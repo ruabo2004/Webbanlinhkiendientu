@@ -1,0 +1,1036 @@
+@model Product
+@using WebBanLinhKienDienTu.Utils
+@using WebBanLinhKienDienTu.Models
+@{
+    ViewBag.Title = Model.ProductName;
+    var firstImage = Model.ImageProducts.FirstOrDefault();
+    var imagePath = firstImage != null ? firstImage.ImagePath : "/Content/images/no-image.jpg";
+    var imageUrl = ImageHelper.ImageUrl(imagePath);
+    var ogImageUrl = imageUrl + (imageUrl.Contains("?") ? "&" : "?") + "w=1200&h=630&mode=crop"; // Open Graph recommended size
+    var fullImageUrl = Request.Url.Scheme + "://" + Request.Url.Authority + ogImageUrl;
+    var productUrl = Request.Url.ToString();
+    var avgRating = Model.Comments.Any() ? Model.Comments.Average(c => (double)c.Rate) : 0;
+    var reviewCount = Model.Comments.Count();
+    var totalStock = Model.ProductColors.Sum(pc => pc.Stock);
+    var availability = totalStock > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock";
+    long priceValue = 0;
+    if (Model.SalePrice != null && Model.SalePrice > 0)
+    {
+        priceValue = (long)Model.SalePrice;
+    }
+    else if (Model.Price != null && Model.Price > 0)
+    {
+        priceValue = (long)Model.Price;
+    }
+    var description = Model.Detail != null && Model.Detail.Length > 160 ? 
+        System.Text.RegularExpressions.Regex.Replace(Model.Detail.Substring(0, 160), "<.*?>", string.Empty) + "..." : 
+        System.Text.RegularExpressions.Regex.Replace(Model.Detail ?? "", "<.*?>", string.Empty);
+}
+
+@section MetaTags {
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="@description Giá @string.Format("{0:N0}đ", priceValue). Trả góp 0%, freeship toàn quốc" />
+    <meta name="keywords" content="@Model.ProductName, @Model.GroupProduct?.GroupName, mua @Model.ProductName.ToLower(), giá bán @Model.ProductName.ToLower()" />
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="product" />
+    <meta property="og:url" content="@productUrl" />
+    <meta property="og:title" content="@Model.ProductName | @ViewBag.Data?.Config["site_title"]" />
+    <meta property="og:description" content="@description" />
+    <meta property="og:image" content="@fullImageUrl" />
+    
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content="@productUrl" />
+    <meta property="twitter:title" content="@Model.ProductName" />
+    <meta property="twitter:description" content="@description" />
+    <meta property="twitter:image" content="@fullImageUrl" />
+    
+    <!-- Schema.org Product Markup (JSON-LD) -->
+    <script type="application/ld+json">
+    {
+        "@@context": "https://schema.org/",
+        "@@type": "Product",
+        "name": "@Model.ProductName",
+        "image": "@fullImageUrl",
+        "description": "@Html.Raw(System.Web.HttpUtility.JavaScriptStringEncode(description))",
+        @if (Model.GroupProduct != null)
+        {
+        <text>"brand": {
+            "@@type": "Brand",
+            "name": "@Model.GroupProduct.GroupName"
+        },</text>
+        }
+        "offers": {
+            "@@type": "Offer",
+            "url": "@productUrl",
+            "priceCurrency": "VND",
+            "price": "@priceValue",
+            "availability": "@availability",
+            "priceValidUntil": "@DateTime.Now.AddMonths(1).ToString("yyyy-MM-dd")",
+            "itemCondition": "https://schema.org/NewCondition"
+        }
+        @if (reviewCount > 0)
+        {
+        <text>,
+        "aggregateRating": {
+            "@@type": "AggregateRating",
+            "ratingValue": "@avgRating.ToString("F1")",
+            "reviewCount": "@reviewCount"
+        }</text>
+        }
+    }
+    </script>
+}
+
+<div id="fb-root"></div>
+<script>
+(function (d, s, id) {
+    var js, fjs = d.getElementsByTagName(s)[0];
+    if (d.getElementById(id)) return;
+    js = d.createElement(s); js.id = id;
+    js.src = "//connect.facebook.net/en_US/sdk.js#xfbml=1&version=v2.8";
+    fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
+
+<div class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-inner">
+            <ul class="list-inline list-unstyled">
+                <li>@Html.ActionLink("Trang chủ", "Index", "Home")</li>
+                @Html.ShowBreadcrumb(Model.GroupProduct)
+            </ul>
+        </div><!-- /.breadcrumb-inner -->
+    </div><!-- /.container -->
+</div>
+<!-- /.breadcrumb -->
+
+<div class="body-content outer-top-xs">
+    <div class="container" style="background-color: white !important; padding: 20px; border-radius: 8px; margin-top: 20px; margin-bottom: 20px;">
+        <div class="row single-product outer-bottom-sm ">
+            <!-- /.sidebar -->
+            <div class="col-md-9">
+                <div class="row  wow fadeInUp animated" style="visibility: visible; animation-name: fadeInUp;">
+                    <div class="col-xs-12 col-sm-6 col-md-5 gallery-holder">
+                        <div class="product-item-holder size-big single-product-gallery small-gallery">
+                            <div id="owl-single-product">
+                                @foreach (ImageProduct image in Model.ImageProducts) { 
+                                    <div class="single-product-gallery-item" id="slide1">
+                                        <a data-lightbox="image-@(Model.ImageProducts.ToList().IndexOf(image))" data-title="Gallery" href="@ImageHelper.ImageUrl(image.ImagePath)">
+                                            <img class="img-responsive" alt="" src="@Url.Content("~/Content/images/blank.gif")" data-echo="@(ImageHelper.ImageUrl(image.ImagePath))?w=370&h=450" />
+                                        </a>
+                                </div><!-- /.single-product-gallery-item -->
+                                }
+                            </div>
+                            <div class="single-product-gallery-thumbs gallery-thumbs">
+                                <div id="owl-single-product-thumbnails">
+                                    @foreach(ImageProduct image in Model.ImageProducts){
+                                        <div class="item">
+                                        <a class="horizontal-thumb active" data-target="#owl-single-product" data-slide="@(Model.ImageProducts.ToList().IndexOf(image))" href="#slide1">
+                                            <img class="img-responsive" alt="" src="@Url.Content("~/Content/images/blank.gif")" data-echo="@(ImageHelper.ImageUrl(image.ImagePath))?w=85&h=85" />
+                                        </a>
+                                    </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div><!-- /.gallery-holder -->
+                    <div class="col-sm-6 col-md-7 product-info-block">
+                        <div class="product-info">
+                            <h1 class="name">@Model.ProductName</h1>
+                            @{
+                                // Load IsNew from database
+                                var db = new ecommerceEntities();
+                                var isNewSql = "SELECT IsNew FROM Products WHERE ProductID = @p0";
+                                var isNewResult = db.Database.SqlQuery<bool?>(isNewSql, Model.ProductID).FirstOrDefault();
+                                var isNew = isNewResult ?? false;
+                            }
+                            @if (isNew)
+                            {
+                                <p style="color: #D70018; font-weight: bold; font-size: 14px; margin: 5px 0;">
+                                    <i class="fa fa-star"></i> Hàng mới
+                                </p>
+                            }
+                            else
+                            {
+                                <p style="color: #666; font-size: 14px; margin: 5px 0;">
+                                    Hàng cũ
+                                </p>
+                            }
+                            <div class="stock-container info-container m-t-10">
+                                <div class="stock-box" style="display: flex; align-items: center; gap: 10px;">
+                                    <span class="label" style="margin: 0;">Tình trạng:</span>
+                                    @if (Model.ProductColors.Count == 0) {
+                                        if(Model.Stock != 0){
+                                            <span class="value available" style="margin: 0;">Còn Hàng</span>
+                                        }
+                                        else
+                                        {
+                                            <span class="value" style="margin: 0;">Hết Hàng</span>
+                                        }
+                                    }
+                                </div>
+                            </div><!-- /.stock-container -->
+
+                            <div class="price-container info-container m-t-20">
+                                <div class="row">
+
+
+                                    <div class="col-sm-8">
+                                        <div class="price-box">
+                                            @if(Model.isSale()){
+                                                <div class="price">@Html.FormatCurrency(@Model.SalePrice) đ</div>
+                                                <div class="price-strike">@Html.FormatCurrency(@Model.Price) đ</div>
+                                                <div>Tiết Kiệm: @Html.FormatCurrency((Model.Price - Model.SalePrice)) đ</div>
+                                            }else{
+                                                <div class="price">@Html.FormatCurrency(Model.Price) đ</div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div><!-- /.row -->
+                            </div><!-- /.price-container -->
+                            
+                            <div class="quantity-container info-container">
+                                @if(Model.ProductColors.Count > 0){
+                                    <!--Color box-->
+                                    <div class="row" style="margin-bottom: 15px;">
+                                        <div class="col-sm-12" style="display: flex; align-items: center; gap: 10px;">
+                                            <span class="label" style="margin: 0; min-width: 80px;">Màu:</span>
+                                            <div class="cart-color" style="flex: 1; max-width: 200px;">
+                                                <div class="color-input">
+                                                    <select name="Color" id="color-choose" class="form-control">
+                                                        @foreach(var color in Model.ProductColors){
+                                                            if (color.Stock > 0)
+                                                            {
+                                                                <option value="@color.ColorID">@color.Color.ColorName</option>
+                                                            }
+                                                            else
+                                                            {
+                                                                <option value="@color.ColorID">@color.Color.ColorName (Hết hàng)</option>
+                                                            }
+                                                        }
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div><!-- /.row -->
+                                    <!--/Color box-->
+                                }
+                                <!--Quantity-->
+                                <div class="row">
+                                    <div class="col-sm-12" style="display: flex; align-items: center; gap: 10px;">
+                                        <span class="label" style="margin: 0; min-width: 80px;">Số lượng:</span>
+                                        <div class="cart-quantity" style="flex: 0 0 auto;">
+                                            <div class="quant-input">
+                                                <div class="arrows">
+                                                    <div class="arrow plus gradient"><span class="ir"><i class="icon fa fa-sort-asc"></i></span></div>
+                                                    <div class="arrow minus gradient"><span class="ir"><i class="icon fa fa-sort-desc"></i></span></div>
+                                                </div>
+                                                <input class="number" id="quantity" name="quantity" type="text" value="1">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <!--Quantity-->
+                                <div class="row m-t-10">
+                                    <div class="col-sm-12">
+                                        <div style="display: flex; flex-direction: column; gap: 10px;">
+                                            <!-- Nút Đặt mua ngay -->
+                                            <a id="btn-buy-now" data-id="@Model.ProductID" href="#" class="btn btn-labeled" style="background-color: #D70018; color: white; border: none; padding: 8px 20px; font-size: 14px; font-weight: bold; text-align: center; text-decoration: none; border-radius: 5px; display: block; width: 100%;">
+                                                <span class="btn-label" style="margin-right: 8px;"><i class="fa fa-shopping-bag"></i></span>
+                                                <div style="display: inline-block;">
+                                                    <div style="font-size: 15px; line-height: 1.1;">ĐẶT MUA NGAY</div>
+                                                    <div style="font-size: 11px; font-weight: normal; opacity: 0.9; line-height: 1.1;">Nhanh chóng, thuận tiện</div>
+                                                </div>
+                                            </a>
+                                            
+                                            <!-- Nút Cho vào giỏ hàng -->
+                                            <a data-id="@Model.ProductID" href="#" class="btn btn-labeled add-cart" style="background-color: white; color: #D70018; border: 2px solid #D70018; padding: 8px 20px; font-size: 14px; font-weight: bold; text-align: center; text-decoration: none; border-radius: 5px; display: block; width: 100%;">
+                                                <span class="btn-label" style="margin-right: 8px;"><i class="fa fa-shopping-cart"></i></span>
+                                                <div style="display: inline-block;">
+                                                    <div style="font-size: 15px; line-height: 1.1;">CHO VÀO GIỎ</div>
+                                                    <div style="font-size: 11px; font-weight: normal; opacity: 0.8; line-height: 1.1;">Mua tiếp sản phẩm khác</div>
+                                                </div>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div><!-- /.quantity-container -->
+
+                            <div class="product-social-link m-t-20 text-right">
+                                <span class="social-label">Share :</span>
+                                <div class="social-icons">
+                                    <ul class="list-inline">
+                                        <li><a class="fa fa-facebook" href="http://facebook.com/transvelo"></a></li>
+                                        <li><a class="fa fa-twitter" href="#"></a></li>
+                                        <li><a class="fa fa-linkedin" href="#"></a></li>
+                                        <li><a class="fa fa-rss" href="#"></a></li>
+                                        <li><a class="fa fa-pinterest" href="#"></a></li>
+                                    </ul><!-- /.social-icons -->
+                                </div>
+                            </div>
+
+
+
+
+                        </div><!-- /.product-info -->
+                    </div><!-- /.col-sm-7 -->
+                </div><!-- /.row -->
+
+                <div class="product-tabs inner-bottom-xs  wow fadeInUp animated" style="visibility: visible; animation-name: fadeInUp;">
+                    <!--Chi tiet san pham-->
+                    <section class="section featured-product wow fadeInUp animated animated" style="visibility: visible; margin-top:10px; animation-name: fadeInUp;">
+                        <h3 class="section-title">Chi tiết sản phẩm</h3>
+                        <div class="product-description-wrapper">
+                            <div class="product-description collapsed" id="product-description">
+                                @Html.Raw(HttpUtility.HtmlDecode(Model.Detail))
+                            </div>
+                            <button type="button" class="btn btn-link btn-show-more" id="btn-show-more" style="display: none; padding: 10px 0; color: #D70018; font-weight: bold; text-decoration: none; border: none; background: none;">
+                                <i class="fa fa-chevron-down"></i> Xem thêm
+                            </button>
+                            <button type="button" class="btn btn-link btn-show-less" id="btn-show-less" style="display: none; padding: 10px 0; color: #D70018; font-weight: bold; text-decoration: none; border: none; background: none;">
+                                <i class="fa fa-chevron-up"></i> Thu gọn
+                            </button>
+                        </div>
+                    </section>
+                    <!--/Chi tiet san pham-->
+
+                    <div class="row">
+                        <ul class="nav nav-tabs">
+                            <li class="active"><a href="#tab-review" data-toggle="tab" aria-expanded="true">Bình luận (@Model.Comments.Count)</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div id="tab-review" class="tab-pane active">
+                                <div class="product-reviews">
+                                    @if (Model.Comments.Any())
+                                    {
+                                        <div class="reviews-list">
+                                            @foreach (var comment in Model.Comments.OrderByDescending(c => c.CommentTime))
+                                            {
+                                                <div class="review-item" style="border-bottom: 1px solid #eee; padding: 15px 0; margin-bottom: 15px;">
+                                                    <div class="review-header" style="margin-bottom: 10px;">
+                                                        <strong style="color: #000000; font-size: 16px;">
+                                                            @if (comment.Customer != null)
+                                                            {
+                                                                @comment.Customer.FullName
+                                                            }
+                                                            else
+                                                            {
+                                                                <text>Khách hàng</text>
+                                                            }
+                                                        </strong>
+                                                        @if (comment.Rate.HasValue && comment.Rate.Value > 0)
+                                                        {
+                                                            <span style="margin-left: 10px; color: #f39c12;">
+                                                                @for (int i = 0; i < comment.Rate.Value; i++)
+                                                                {
+                                                                    <i class="fa fa-star"></i>
+                                                                }
+                                                                @for (int i = comment.Rate.Value; i < 5; i++)
+                                                                {
+                                                                    <i class="fa fa-star-o"></i>
+                                                                }
+                                                            </span>
+                                                        }
+                                                        <span style="color: #000000; font-size: 13px; margin-left: 10px;">
+                                                            @if (comment.CommentTime.HasValue)
+                                                            {
+                                                                @comment.CommentTime.Value.ToString("dd/MM/yyyy HH:mm")
+                                                            }
+                                                        </span>
+                                                    </div>
+                                                    <div class="review-content" style="color: #000000; line-height: 1.6;">
+                                                        @comment.CommentContent
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div class="no-reviews" style="padding: 30px; text-align: center; color: #000000;">
+                                            <i class="fa fa-comments-o" style="font-size: 48px; margin-bottom: 15px;"></i>
+                                            <p>Chưa có đánh giá nào cho sản phẩm này .</p>
+                                            <p>Hãy là người đầu tiên đánh giá sản phẩm này!</p>
+                                        </div>
+                                    }
+                                    
+                                    @* Form thêm đánh giá mới *@
+                                    <div class="review-form" style="margin-top: 30px; padding-top: 30px; border-top: 2px solid #eee;">
+                                        <h4 style="margin-bottom: 20px; color: #000000;">Viết đánh giá của bạn</h4>
+                                        
+                                        @if (TempData["SuccessMessage"] != null)
+                                        {
+                                            <div class="alert alert-success alert-dismissible">
+                                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+                                            </div>
+                                        }
+                                        
+                                        @if (TempData["ErrorMessage"] != null)
+                                        {
+                                            <div class="alert alert-danger alert-dismissible">
+                                                <button type="button" class="close" data-dismiss="alert">&times;</button>
+                                                <i class="fa fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+                                            </div>
+                                        }
+                                        
+                                        @if (User.Identity.IsAuthenticated)
+                                        {
+                                            using (Html.BeginForm("AddComment", "Product", FormMethod.Post, new { @class = "form-horizontal", id = "comment-form" }))
+                                            {
+                                                @Html.Hidden("productId", Model.ProductID)
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label" style="color: #000000;">Đánh giá </label>
+                                                    <div class="col-sm-10">
+                                                        <div class="rating-input">
+                                                            <i class="fa fa-star-o rate-star" data-rate="1"></i>
+                                                            <i class="fa fa-star-o rate-star" data-rate="2"></i>
+                                                            <i class="fa fa-star-o rate-star" data-rate="3"></i>
+                                                            <i class="fa fa-star-o rate-star" data-rate="4"></i>
+                                                            <i class="fa fa-star-o rate-star" data-rate="5"></i>
+                                                            <input type="hidden" name="rate" id="rate-value" value="5" />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <label class="col-sm-2 control-label" style="color: #000000;">Nội dung <span class="text-danger">*</span></label>
+                                                    <div class="col-sm-10">
+                                                        <textarea name="content" rows="4" class="form-control" placeholder="Nhập đánh giá của bạn..." required></textarea>
+                                                    </div>
+                                                </div>
+                                                <div class="form-group">
+                                                    <div class="col-sm-offset-2 col-sm-10">
+                                                        <button type="submit" class="btn btn-primary" style="color: #000000; background-color: #f0f0f0; border-color: #ccc;">
+                                                            <i class="fa fa-paper-plane"></i> Gửi đánh giá
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <div class="alert alert-info">
+                                                <i class="fa fa-info-circle"></i>
+                                                Bạn cần <a href="@Url.Action("Login", "Account", new { returnUrl = Request.Url.PathAndQuery })">đăng nhập</a> để viết đánh giá.
+                                            </div>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div><!-- /.product-tabs -->
+
+                <section class="section featured-product wow fadeInUp animated animated animated" style="visibility: visible; animation-name: fadeInUp;">
+                    <h3 class="section-title">Sản phẩm khác</h3>
+                    <div class="product-slider">
+                        <div class="owl-carousel home-owl-carousel custom-carousel owl-theme" data-item="4">
+                            @foreach (Product product in Model.GroupProduct.Products.Where(p=>p.ProductID!=Model.ProductID))
+                            {
+                                <div class="item item-carousel">
+                                    <div class="products">
+
+                                        <div class="product">
+                                            <div class="product-image">
+                                                <div class="image">
+                                                    <a href="@Url.Action("Detail", "Product", new { id = product.ProductID})">
+                                                        @{
+                                var imgUrl = ImageHelper.DefaultImage();
+                                if (product.ImageProducts.Count > 0)
+                                {
+                                    imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                }
+                                imgUrl += "?w=195&h=250";
+                                                        }
+                                                        <img src="@Url.Content("~/Content/images/blank.gif")" data-echo="@Url.Content(imgUrl)" alt="">
+                                                    </a>
+                                                </div><!-- /.image -->
+                                                <div class="tag new"><span>new</span></div>
+                                            </div><!-- /.product-image -->
+
+                                            <div class="product-info text-left">
+                                                <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID},null)">@product.ProductName</a></h3>
+                                                <div class="rating rateit-small"></div>
+                                                <div class="description"></div>
+                                                <div class="product-price">
+                                                    <span class="price">
+                                                        @if (product.isSale())
+                                                        {
+                                                            @Html.FormatCurrency(product.SalePrice) <span>d</span>
+                                                        }
+                                                        else
+                                                        {
+                                                            @Html.FormatCurrency(product.Price) <span>d</span>
+                                                        }
+                                                    </span>
+                                                    @if (product.isSale())
+                                                    {
+                                                        <span class="price-before-discount">@Html.FormatCurrency(product.Price) d</span>
+                                                    }
+
+                                                </div>
+
+                                            </div><!-- /.product-info -->
+                                            <div class="cart clearfix animate-effect">
+                                                <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                    <span class="btn-label"><i class="fa fa-shopping-cart add-cart"></i></span>Thêm vào giỏ hàng
+                                                </a>
+                                            </div><!-- /.cart -->
+                                        </div><!-- /.product -->
+
+                                    </div><!-- /.products -->
+                                </div><!-- /.item -->
+                            }
+                        </div><!-- /.home-owl-carousel -->
+                    </div><!-- /.product-slider -->
+                </section>
+               
+            </div><!-- /.col -->
+            <div class="col-md-3 sidebar">
+                <div class="sidebar-module-container">
+                    @* Hot Deals Section - Load from database *@
+                    <div class="sidebar-widget hot-deals wow fadeInUp animated">
+                        <h3 class="section-title">Hot Deals</h3>
+                        <div class="hot-deals-vertical-container">
+                            @if (ViewBag.Sale != null && ((IEnumerable<Product>)ViewBag.Sale).Any())
+                            {
+                                var saleProducts = ((IEnumerable<Product>)ViewBag.Sale).ToList();
+                                <div class="hot-deals-list">
+                                @foreach (var hotProduct in saleProducts)
+                                {
+                                    var discountPercent = hotProduct.isSale() ? (int)(((hotProduct.Price - hotProduct.SalePrice) * 100) / hotProduct.Price) : 0;
+                                    var imgUrl = ImageHelper.DefaultImage();
+                                    if (hotProduct.ImageProducts.Count > 0)
+                                    {
+                                        imgUrl = ImageHelper.ImageUrl(hotProduct.ImageProducts.FirstOrDefault().ImagePath);
+                                    }
+                                    imgUrl += "?w=150&h=150";
+                                    
+                                    <div class="hot-deal-item">
+                                        <div class="product-image-small">
+                                            <div class="image">
+                                                <a href="@Url.Action("Detail", "Product", new { id = hotProduct.ProductID })">
+                                                    <img src="@imgUrl" alt="@hotProduct.ProductName" />
+                                                </a>
+                                            </div>
+                                            @if (discountPercent > 0)
+                                            {
+                                                <div class="tag sale"><span>-@discountPercent%</span></div>
+                                            }
+                                        </div>
+                                        <div class="product-info-small">
+                                            <h4 class="name">
+                                                <a href="@Url.Action("Detail", "Product", new { id = hotProduct.ProductID })" title="@hotProduct.ProductName">
+                                                    @(hotProduct.ProductName.Length > 40 ? hotProduct.ProductName.Substring(0, 40) + "..." : hotProduct.ProductName)
+                                                </a>
+                                            </h4>
+                                            <div class="product-price">
+                                                @if (hotProduct.isSale())
+                                                {
+                                                    <span class="price">@Html.FormatCurrency(hotProduct.SalePrice) đ</span>
+                                                    <span class="price-before-discount">@Html.FormatCurrency(hotProduct.Price) đ</span>
+                                                }
+                                                else
+                                                {
+                                                    <span class="price">@Html.FormatCurrency(hotProduct.Price) đ</span>
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="item">
+                                    <p class="text-center">Chưa có sản phẩm khuyến mãi</p>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                    @* Old hardcoded hot deals and advertisement removed *@
+                </div>
+            </div><div class="clearfix"></div>
+        </div><!-- /.row -->
+       </div><!-- /.container -->
+</div>
+
+
+@section masterjs{
+    <style>
+        /* Đổi tất cả text màu xám thành màu đen */
+        .nav-tabs > li > a {
+            color: #000000 !important;
+        }
+        
+        .nav-tabs > li.active > a {
+            color: #000000 !important;
+        }
+        
+        .form-horizontal .control-label {
+            color: #000000 !important;
+        }
+        
+        .review-form h4 {
+            color: #000000 !important;
+        }
+        
+        /* Đổi màu tên sản phẩm thành màu đen */
+        .product-info h1.name,
+        h1.name {
+            color: #000000 !important;
+            font-weight: 600 !important;
+        }
+        
+        /* Đổi màu các label thành màu đen */
+        .stock-container .label,
+        .quantity-container .label,
+        .product-info .label,
+        span.label {
+            color: #000000 !important;
+            font-weight: 500 !important;
+            text-transform: none !important; /* Đảm bảo không viết hoa */
+            font-family: inherit !important; /* Dùng font mặc định, không override */
+        }
+        
+        /* Đổi màu text "Tiết Kiệm" thành màu đen */
+        .price-container .price-box > div:not(.price):not(.price-strike) {
+            color: #000000 !important;
+        }
+        
+        /* Đổi màu giá cũ (strikethrough) thành màu đen */
+        .price-strike {
+            color: #000000 !important;
+        }
+        
+        /* Rating stars styling */
+        .rating-input {
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .rating-input .rate-star {
+            color: #ddd;
+            transition: color 0.2s;
+            margin-right: 5px;
+        }
+        .rating-input .rate-star:hover,
+        .rating-input .rate-star.active {
+            color: #f39c12;
+        }
+        
+        /* Review item styling */
+        .review-item {
+            animation: fadeIn 0.5s;
+        }
+        
+        @@keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .review-form textarea:focus {
+            border-color: #f39c12;
+            box-shadow: 0 0 5px rgba(243, 156, 18, 0.3);
+        }
+        
+        /* Product description collapse */
+        .product-description-wrapper {
+            position: relative;
+        }
+        
+        .product-description {
+            overflow: hidden;
+            line-height: 1.6;
+        }
+        
+        .product-description-collapsed {
+            line-height: 1.6;
+        }
+        
+        .product-description.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 4;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-height: calc(1.6em * 4);
+        }
+        
+        .btn-show-more, .btn-show-less {
+            margin-top: 10px;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+        
+        .btn-show-more:hover, .btn-show-less:hover {
+            color: #a50012 !important;
+        }
+        
+        .btn-show-more i, .btn-show-less i {
+            margin-right: 5px;
+        }
+        
+        /* Button styling */
+        #btn-buy-now:hover {
+            background-color: #a50012 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .add-cart:hover {
+            background-color: #f8f8f8 !important;
+            border-color: #a50012 !important;
+            color: #a50012 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            transition: all 0.3s ease;
+        }
+        
+        /* Hot Deals Vertical Layout */
+        .hot-deals-vertical-container {
+            width: 100%;
+        }
+        
+        .hot-deals-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            max-height: calc(3 * (180px + 15px)); /* 3 items với height ~180px mỗi item + gap */
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding-right: 5px;
+        }
+        
+        .hot-deals-list::-webkit-scrollbar {
+            width: 6px;
+        }
+        
+        .hot-deals-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        .hot-deals-list::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 3px;
+        }
+        
+        .hot-deals-list::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        .hot-deal-item {
+            display: flex;
+            gap: 12px;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+            background: #fff;
+            transition: all 0.3s ease;
+            min-height: 120px;
+        }
+        
+        .hot-deal-item:hover {
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-color: #D70018;
+        }
+        
+        .product-image-small {
+            position: relative;
+            flex-shrink: 0;
+            width: 100px;
+            height: 100px;
+        }
+        
+        .product-image-small .image {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        
+        .product-image-small .image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .product-image-small .tag.sale {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #D70018;
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            font-weight: bold;
+        }
+        
+        .product-info-small {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        
+        .product-info-small .name {
+            margin: 0 0 8px 0;
+            font-size: 13px;
+            line-height: 1.4;
+        }
+        
+        .product-info-small .name a {
+            color: #000000;
+            text-decoration: none;
+        }
+        
+        .product-info-small .name a:hover {
+            color: #D70018;
+        }
+        
+        .product-info-small .product-price {
+            margin-top: auto;
+        }
+        
+        .product-info-small .product-price .price {
+            color: #D70018;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        
+        .product-info-small .product-price .price-before-discount {
+            color: #000000;
+            text-decoration: line-through;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        
+        .no-hot-deals {
+            padding: 20px;
+            text-align: center;
+            color: #000000;
+        }
+    </style>
+    
+    <script>
+        // Add to cart functionality - Cho vào giỏ hàng
+        $('.add-cart').off('click').on('click', function (e) {
+            e.preventDefault();
+            console.log('Add to cart button clicked!');
+            var $this = $(this);
+            $this.blur();
+            var product_id = $this.data('id');
+            console.log('Product ID:', product_id);
+            var color = $('#color-choose').val();
+            console.log('Color selected:', color);
+            if (color === undefined)
+                color = null;
+            var quantity = isNaN(parseInt($('#quantity').val())) ? 1 : parseInt($('#quantity').val());
+            console.log('Quantity:', quantity);
+            $('#quantity').val(quantity);
+
+            if (quantity == 0) {
+                Msg.error("Bạn phải đặt ít nhất 1 sản phẩm!!!", 1500);
+                return false;
+            }
+            console.log('Posting to /Cart/AddCart with params:', { id: product_id, color: color, quantity: quantity });
+            $.post("/Cart/AddCart", { id: product_id, color: color, quantity: quantity }, function (data) {
+                console.log('AddCart success! Response:', data);
+                var item_name = $('.product-info h1.name').text();
+                if (color != null)
+                    item_name += ' <span style="color:#000;">(' + $('#color-choose option:selected').text() + ')</span>';
+                Msg.success("Đã thêm <strong>' " + quantity + " " + item_name + "'</strong> vào giỏ hàng!", 1500);
+                // Cập nhật số lượng giỏ hàng trong header
+                $.get('@Url.Action("GetCartCount", "Cart")', function(data) {
+                    $("#cart-count").text(data.count);
+                });
+                if ($('#checkout').hasClass('disabled'))
+                    $('#checkout').removeClass('disabled');
+            }).fail(function(xhr, status, error) {
+                console.error('AddCart FAILED!');
+                console.error('Status:', status);
+                console.error('Error:', error);
+                console.error('Response:', xhr.responseText);
+                Msg.error("Lỗi khi thêm vào giỏ hàng: " + error, 3000);
+            });
+            return false;
+        });
+
+        // Nút "Đặt mua ngay" - thêm vào giỏ và chuyển đến checkout
+        $('#btn-buy-now').off('click').on('click', function (e) {
+            e.preventDefault();
+            var $this = $(this);
+            $this.blur();
+            var product_id = $this.data('id');
+            var color = $('#color-choose').val();
+            if (color === undefined)
+                color = null;
+            var quantity = isNaN(parseInt($('#quantity').val())) ? 1 : parseInt($('#quantity').val());
+            $('#quantity').val(quantity);
+
+            if (quantity == 0) {
+                Msg.error("Bạn phải đặt ít nhất 1 sản phẩm!!!", 1500);
+                return false;
+            }
+
+            $.post("/Cart/AddCart", { id: product_id, color: color, quantity: quantity }, function (data) {
+                var item_name = $('.product-info h1.name').text();
+                if (color != null)
+                    item_name += ' (' + $('#color-choose option:selected').text() + ')';
+                
+                Msg.success("Đã thêm <strong>" + quantity + " " + item_name + "</strong> vào giỏ hàng!", 1000);
+                // Cập nhật số lượng giỏ hàng
+                $.get('@Url.Action("CartHeaderView", "Cart")', function(headerHtml) {
+                    $("#cart_shop").html(headerHtml);
+                });
+                
+                // Chuyển đến trang checkout sau 1 giây
+                setTimeout(function() {
+                    window.location.href = '@Url.Action("Shipping", "Checkout")';
+                }, 1000);
+            }).fail(function(xhr, status, error) {
+                console.error('AddCart FAILED!', error);
+                Msg.error("Lỗi khi thêm vào giỏ hàng: " + error, 3000);
+            });
+            return false;
+        });
+        
+        // Rating stars interaction
+        $(document).ready(function() {
+            var selectedRating = 5; // Default 5 stars
+            
+            // Hover effect
+            $('.rate-star').hover(
+                function() {
+                    var rating = $(this).data('rate');
+                    $('.rate-star').each(function() {
+                        if ($(this).data('rate') <= rating) {
+                            $(this).removeClass('fa-star-o').addClass('fa-star');
+                        } else {
+                            $(this).removeClass('fa-star').addClass('fa-star-o');
+                        }
+                    });
+                },
+                function() {
+                    // Reset to selected rating
+                    $('.rate-star').each(function() {
+                        if ($(this).data('rate') <= selectedRating) {
+                            $(this).removeClass('fa-star-o').addClass('fa-star');
+                        } else {
+                            $(this).removeClass('fa-star').addClass('fa-star-o');
+                        }
+                    });
+                }
+            );
+            
+            // Click to select rating
+            $('.rate-star').click(function() {
+                selectedRating = $(this).data('rate');
+                $('#rate-value').val(selectedRating);
+                
+                $('.rate-star').each(function() {
+                    if ($(this).data('rate') <= selectedRating) {
+                        $(this).removeClass('fa-star-o').addClass('fa-star active');
+                    } else {
+                        $(this).removeClass('fa-star active').addClass('fa-star-o');
+                    }
+                });
+            });
+            
+            // Initialize with 5 stars
+            $('.rate-star').each(function() {
+                if ($(this).data('rate') <= 5) {
+                    $(this).removeClass('fa-star-o').addClass('fa-star active');
+                }
+            });
+            
+            // Scroll to comments if there's a message
+            @if (TempData["SuccessMessage"] != null || TempData["ErrorMessage"] != null)
+            {
+                <text>
+                setTimeout(function() {
+                    $('html, body').animate({
+                        scrollTop: $('#product-tabs').offset().top - 100
+                    }, 500);
+                }, 100);
+                </text>
+            }
+            
+            // Form validation
+            $('#comment-form').on('submit', function(e) {
+                var content = $.trim($('textarea[name="content"]').val());
+                if (content.length === 0) {
+                    e.preventDefault();
+                    Msg.error('Vui lòng nhập nội dung đánh giá!', 2000);
+                    return false;
+                }
+                if (content.length < 10) {
+                    e.preventDefault();
+                    Msg.error('Nội dung đánh giá phải có ít nhất 10 ký tự!', 2000);
+                    return false;
+                }
+            });
+        });
+
+        var check_cart = function(button, e){
+            e.preventDefault();
+            $.getJSON('/AppApi/TotalCart', function (data) {
+                if(data.count > 0){
+                    location.href = $(button).attr('href');
+                } else {
+                    Msg.error('Giỏ hàng của bạn chưa có sản phẩm nào, hãy thêm sản phẩm vào đi!',2500);
+                }
+            });
+        }
+
+        // Product description collapse/expand functionality
+        $(document).ready(function() {
+            var $description = $('#product-description');
+            var $btnShowMore = $('#btn-show-more');
+            var $btnShowLess = $('#btn-show-less');
+            
+            // Check if content exceeds 4 lines
+            function checkContentHeight() {
+                // Reset to get actual height
+                $description.removeClass('collapsed');
+                var actualHeight = $description[0].scrollHeight;
+                var lineHeight = parseFloat($description.css('line-height'));
+                var maxHeight = lineHeight * 4;
+                
+                if (actualHeight > maxHeight) {
+                    // Content exceeds 4 lines, show collapse
+                    $description.addClass('collapsed');
+                    $btnShowMore.show();
+                } else {
+                    // Content fits in 4 lines, hide buttons
+                    $btnShowMore.hide();
+                    $btnShowLess.hide();
+                }
+            }
+            
+            // Show more
+            $btnShowMore.on('click', function() {
+                $description.removeClass('collapsed');
+                $btnShowMore.hide();
+                $btnShowLess.show();
+            });
+            
+            // Show less
+            $btnShowLess.on('click', function() {
+                $description.addClass('collapsed');
+                $btnShowLess.hide();
+                $btnShowMore.show();
+            });
+            
+            // Check on page load and after images load
+            checkContentHeight();
+            $(window).on('load', function() {
+                setTimeout(checkContentHeight, 100);
+            });
+        });
+
+    </script>    
+}

@@ -1,0 +1,557 @@
+@* AI Chatbot Widget *@
+<div id="ai-chatbox-container" class="ai-chatbox-container">
+    <!-- Toggle Button -->
+    <button id="ai-chat-toggle" class="ai-chat-toggle" title="Trợ lý AI - Nhấn để chat">
+        <i class="fa fa-comments"></i>
+        <span class="ai-badge">AI</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="ai-chat-window" class="ai-chat-window" style="display: none;">
+        <!-- Header -->
+        <div class="ai-chat-header">
+            <div class="ai-chat-title">
+                <i class="fa fa-robot"></i>
+                <span>Trợ lý mua sắm AI</span>
+            </div>
+            <button id="ai-chat-close" class="ai-chat-close" title="Đóng">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="ai-chat-messages" id="ai-chat-messages">
+            <div class="ai-message">
+                <div class="ai-avatar">
+                    <i class="fa fa-magic"></i>
+                </div>
+                <div class="ai-message-content">
+                    <strong>Xin chào!</strong> Tôi là trợ lý AI 😊<br>
+                    Tôi có thể giúp bạn:<br>
+                    • Tìm sản phẩm phù hợp<br>
+                    • Tư vấn giá cả<br>
+                    • So sánh sản phẩm<br>
+                    <br>
+                    <em>Bạn đang tìm kiếm gì hôm nay?</em> 🛒
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Container -->
+        <div class="ai-chat-input-container">
+            <input type="text" 
+                   id="ai-chat-input" 
+                   placeholder="Nhập câu hỏi của bạn..." 
+                   class="ai-chat-input"
+                   autocomplete="off" />
+                <button type="button" id="ai-chat-send" class="ai-chat-send-btn" title="Gửi">
+                <i class="fa fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* === CHATBOX CONTAINER === */
+.ai-chatbox-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+    font-family: 'Lato', sans-serif;
+}
+
+/* === TOGGLE BUTTON === */
+.ai-chat-toggle {
+    position: relative;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(238, 90, 36, 0.4);
+    font-size: 24px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ai-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(238, 90, 36, 0.6);
+}
+
+.ai-chat-toggle .ai-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+}
+
+/* === CHAT WINDOW === */
+.ai-chat-window {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    height: 550px;
+    max-height: calc(100vh - 120px);
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === HEADER === */
+.ai-chat-header {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+}
+
+.ai-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.ai-chat-close {
+    background: rgba(255, 255, 255, 0.2);
+    border: none;
+    color: white;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.ai-chat-close:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* === MESSAGES === */
+.ai-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 15px;
+    background: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.ai-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.ai-chat-messages::-webkit-scrollbar-thumb {
+    background: #ddd;
+    border-radius: 3px;
+}
+
+.ai-message {
+    display: flex;
+    gap: 10px;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-message {
+    flex-direction: row-reverse;
+}
+
+@@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.ai-avatar {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    flex-shrink: 0;
+    color: white;
+}
+
+.user-message .ai-avatar {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+}
+
+.ai-message-content {
+    background: white;
+    padding: 10px 12px;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
+    max-width: 95%;
+    line-height: 1.5;
+    font-size: 13px;
+}
+
+.user-message .ai-message-content {
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+}
+
+.ai-message-content strong {
+    display: block;
+    margin-bottom: 5px;
+}
+
+.loading-message {
+    padding: 8px 15px;
+    background: #e9ecef;
+    border-radius: 15px;
+    font-style: italic;
+    color: #666;
+}
+
+/* === INPUT === */
+.ai-chat-input-container {
+    display: flex;
+    padding: 15px;
+    gap: 10px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+}
+
+.ai-chat-input {
+    flex: 1;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    padding: 10px 15px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.ai-chat-input:focus {
+    border-color: #ff6b6b;
+}
+
+.ai-chat-send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+    color: white;
+    cursor: pointer;
+    transition: transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    pointer-events: auto;
+    z-index: 1;
+}
+
+.ai-chat-send-btn i {
+    pointer-events: none;
+}
+
+.ai-chat-send-btn:hover {
+    transform: scale(1.1);
+}
+
+.ai-chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* === MOBILE RESPONSIVE === */
+@@media (max-width: 480px) {
+    .ai-chat-window {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 100px);
+        bottom: 70px;
+    }
+    
+    .ai-chatbox-container {
+        bottom: 10px;
+        right: 10px;
+    }
+}
+</style>
+
+<script>
+$(document).ready(function() {
+    var isOpen = false;
+    window.aiChatIsOpen = false; // Expose để chat Admin có thể truy cập
+    var isProcessing = false;
+
+    // === TOGGLE CHAT WINDOW ===
+    $('#ai-chat-toggle').on('click', function() {
+        isOpen = !isOpen;
+        window.aiChatIsOpen = isOpen; // Đồng bộ với window object
+        $('#ai-chat-window').toggle();
+        
+        // Đóng chat Admin nếu đang mở
+        if (isOpen && $('#admin-chat-window').is(':visible')) {
+            $('#admin-chat-window').hide();
+            // Cập nhật biến isOpen của Admin chat
+            if (typeof window.adminChatIsOpen !== 'undefined') {
+                window.adminChatIsOpen = false;
+            }
+        }
+        
+        if (isOpen) {
+            $('#ai-chat-input').focus();
+        }
+    });
+
+    $('#ai-chat-close').on('click', function() {
+        isOpen = false;
+        window.aiChatIsOpen = false; // Đồng bộ với window object
+        $('#ai-chat-window').hide();
+    });
+
+    // === SEND MESSAGE ===
+    function sendMessage() {
+        if (isProcessing) return;
+
+        var question = $('#ai-chat-input').val().trim();
+        if (!question) return;
+
+        console.log('🤖 [AI Chatbot] Gửi câu hỏi:', question);
+
+        isProcessing = true;
+        $('#ai-chat-send').prop('disabled', true);
+
+        addMessage(question, true, null);
+        $('#ai-chat-input').val('');
+
+        var loadingId = addLoadingMessage();
+        
+        var requestData = {
+            Question: question,
+            UserId: @{
+                var currentCustomer = WebBanLinhKienDienTu.Core.UserManager.CurrentCustomer;
+                var userId = currentCustomer != null ? currentCustomer.CustomerID : 0;
+                @userId
+            }
+        };
+        
+        console.log('📤 [AI Chatbot] Request data:', requestData);
+        console.log('📡 [AI Chatbot] Gọi API: /api/ai/chat');
+        
+        $.ajax({
+            url: '/api/ai/chat',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(requestData),
+            success: function(response) {
+                console.log('✅ [AI Chatbot] Response thành công:', response);
+                removeLoadingMessage(loadingId);
+
+                if (response.Success) {
+                    console.log('✅ [AI Chatbot] Có ' + (response.RelatedProducts ? response.RelatedProducts.length : 0) + ' sản phẩm gợi ý');
+                    addMessage(response.Answer, false, response.RelatedProducts);
+                } else {
+                    console.warn('⚠️ [AI Chatbot] Response.Success = false, ErrorMessage:', response.ErrorMessage);
+                    addMessage(response.Answer || 'Xin lỗi, đã có lỗi xảy ra!', false, null);
+                }
+            },
+            error: function(xhr) {
+                console.error('❌ [AI Chatbot] AJAX Error:', {
+                    status: xhr.status,
+                    statusText: xhr.statusText,
+                    responseText: xhr.responseText
+                });
+                removeLoadingMessage(loadingId);
+                addMessage('Xin lỗi, không thể kết nối với trợ lý AI. Vui lòng thử lại sau! 😓', false, null);
+            },
+            complete: function() {
+                console.log('🏁 [AI Chatbot] Request hoàn thành');
+                isProcessing = false;
+                $('#ai-chat-send').prop('disabled', false);
+                $('#ai-chat-input').focus();
+            }
+        });
+    }
+
+    function addMessage(text, isUser, products) {
+        var html = '<div class="ai-message' + (isUser ? ' user-message' : '') + '">';
+        html += '<div class="ai-avatar">';
+        html += isUser ? '<i class="fa fa-user"></i>' : '<i class="fa fa-magic"></i>';
+        html += '</div>';
+        html += '<div class="ai-message-content">';
+        
+        if (products && products.length > 0 && !isUser) {
+            var lines = text.split('\n');
+            var greeting = lines[0] || 'Chào bạn! ';
+            html += '<div style="margin-bottom: 12px; font-size: 14px;">' + formatMessage(greeting) + '</div>';
+            
+            // ✅ CHỈ hiển thị 1 sản phẩm duy nhất (sản phẩm tốt nhất)
+            var displayProducts = products.slice(0, 1); // Chỉ lấy sản phẩm đầu tiên
+            
+            html += '<div style="display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 12px; max-width: 100%;">';
+            
+            console.log('🖼️ [AI Chatbox Frontend] Hiển thị 1 sản phẩm duy nhất');
+            
+            displayProducts.forEach(function(product) {
+                // Debug: Kiểm tra dữ liệu sản phẩm
+                console.log('🛍️ [AI Chat] Hiển thị sản phẩm:', {
+                    id: product.Id,
+                    name: product.Name,
+                    imageUrl: product.ImageUrl,
+                    url: product.Url
+                });
+                html += '<div class="product" style="background: #fff; border: 1px solid #e5e5e5; border-radius: 4px; overflow: hidden; transition: all 0.3s; cursor: pointer;" onmouseover="this.style.boxShadow=\'0 4px 12px rgba(0,0,0,0.15)\'" onmouseout="this.style.boxShadow=\'none\'">';
+                
+                html += '<div class="product-image" style="position: relative; overflow: hidden; background: #fff;">';
+                html += '<div class="image" style="text-align: center; padding: 10px;">';
+                html += '<a href="' + product.Url + '" target="_blank" style="display: block;">';
+                html += '<img src="' + product.ImageUrl + '" alt="' + product.Name + '" ';
+                html += 'onerror="this.src=\'/Content/images/no-image.jpg\'" ';
+                html += 'style="width: 100%; height: 140px; object-fit: contain; transition: transform 0.3s;" ';
+                html += 'onmouseover="this.style.transform=\'scale(1.05)\'" onmouseout="this.style.transform=\'scale(1)\'">';
+                html += '</a>';
+                html += '</div>';
+                
+                if (product.PromotionPrice && product.PromotionPrice < product.Price) {
+                    var discount = Math.round(((product.Price - product.PromotionPrice) / product.Price) * 100);
+                    html += '<div class="tag sale" style="position: absolute; top: 8px; right: 8px; background: #ff6161; color: white; padding: 4px 8px; border-radius: 3px; font-size: 11px; font-weight: bold;">';
+                    html += '<span>-' + discount + '%</span>';
+                    html += '</div>';
+                }
+                html += '</div>';
+                
+                html += '<div class="product-info" style="padding: 10px; text-align: left;">';
+                html += '<h3 class="name" style="margin: 0 0 8px 0; font-size: 13px; line-height: 1.3; height: 36px; overflow: hidden;">';
+                html += '<a href="' + product.Url + '" target="_blank" style="color: #333; text-decoration: none; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">';
+                html += product.Name;
+                html += '</a>';
+                html += '</h3>';
+                
+                html += '<div class="product-price" style="margin-top: 8px;">';
+                if (product.PromotionPrice && product.PromotionPrice < product.Price) {
+                    html += '<span class="price" style="color: #ff6161; font-size: 16px; font-weight: bold;">';
+                    html += formatPrice(product.PromotionPrice);
+                    html += '</span><br>';
+                    html += '<span class="price-before-discount" style="color: #999; font-size: 12px; text-decoration: line-through;">';
+                    html += formatPrice(product.Price);
+                    html += '</span>';
+                } else {
+                    html += '<span class="price" style="color: #ff6161; font-size: 16px; font-weight: bold;">';
+                    html += formatPrice(product.Price);
+                    html += '</span>';
+                }
+                html += '</div>';
+                html += '</div>';
+                
+                html += '</div>';
+            });
+            
+            html += '</div>';
+            
+            var remainingText = lines.slice(1).join('\n').trim();
+            if (remainingText) {
+                html += '<div style="font-size: 13px; line-height: 1.6; color: #666;">' + formatMessage(remainingText) + '</div>';
+            }
+        } else {
+            html += formatMessage(text);
+        }
+        
+        html += '</div>';
+        html += '</div>';
+
+        $('#ai-chat-messages').append(html);
+        scrollToBottom();
+    }
+
+    function addLoadingMessage() {
+        var id = 'loading-' + Date.now();
+        var html = '<div id="' + id + '" class="ai-message">';
+        html += '<div class="ai-avatar"><i class="fa fa-magic"></i></div>';
+        html += '<div class="loading-message"><i class="fa fa-spinner fa-spin"></i> Đang suy nghĩ...</div>';
+        html += '</div>';
+
+        $('#ai-chat-messages').append(html);
+        scrollToBottom();
+        return id;
+    }
+
+    function removeLoadingMessage(id) {
+        $('#' + id).remove();
+    }
+
+    function formatMessage(text) {
+        text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        text = text.replace(/\n/g, '<br>');
+        return text;
+    }
+
+    function formatPrice(price) {
+        return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(price);
+    }
+
+    function scrollToBottom() {
+        var messages = $('#ai-chat-messages');
+        messages.scrollTop(messages[0].scrollHeight);
+    }
+
+    $(document).on('click', '#ai-chat-send', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        sendMessage();
+        return false;
+    });
+
+    setTimeout(function() {
+        $('#ai-chat-send').off('click').on('click', function(e) {
+            e.preventDefault();
+            sendMessage();
+            return false;
+        });
+    }, 100);
+
+    $('#ai-chat-input').on('keypress', function(e) {
+        if (e.which === 13 && !e.shiftKey) {
+            e.preventDefault();
+            sendMessage();
+        }
+    });
+
+    $(document).on('keydown', function(e) {
+        if (e.key === 'Escape' && isOpen) {
+            $('#ai-chat-close').click();
+        }
+    });
+});
+</script>
+

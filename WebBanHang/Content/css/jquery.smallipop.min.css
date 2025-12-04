@@ -1,0 +1,4 @@
+/* Minimal smallipop CSS stub to avoid 404 when full library is not present */
+.smallipop {
+    display: inline-block;
+}

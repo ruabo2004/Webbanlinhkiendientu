@@ -1,0 +1,309 @@
+﻿
+@{
+    ViewBag.Title = "Quản lý giỏ hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var cart = ShoppingCart.Instance;
+}
+
+<!-- ============================================== HEADER : END ============================================== -->
+<div class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-inner">
+            <ul class="list-inline list-unstyled">
+                <li><a href="@Url.Action("Index","Home")">Home</a></li>
+                <li class='active'>@ViewBag.Title</li>
+            </ul>
+        </div><!-- /.breadcrumb-inner -->
+    </div><!-- /.container -->
+</div><!-- /.breadcrumb -->
+
+<div class="body-content outer-top-xs">
+    <div class="container">
+        <div class="row inner-bottom-sm">
+            @if (cart.Items.Count > 0) { 
+            <div class="shopping-cart">
+                <div class="col-md-8 col-sm-12 shopping-cart-table ">
+                    <div class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width:120px;">Hình ảnh</th>
+                                    <th class="text-left">Sản phẩm</th>
+                                    <th class="text-left" style="width:150px;">Số lượng</th>
+                                    <th class="text-right" style="width:120px;">Giá</th>
+                                    <th class="text-right" style="width:120px;">Tổng</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach(var item in cart.Items){
+                                    <tr>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })">
+                                            @{
+                                                var imgUrl = ImageHelper.DefaultImage();
+                                                if (item.Product.ImageProducts.FirstOrDefault() != null)
+                                                {
+                                                    imgUrl = ImageHelper.ImageUrl(item.Product.ImageProducts.FirstOrDefault().ImagePath);
+                                                }
+                                            }
+                                            <img src="@imgUrl?w=80&h=80" alt="Aspire Ultrabook Laptop" title="Aspire Ultrabook Laptop" class="img-thumbnail">
+                                        </a>
+                                        </td>
+                                    <td class="text-left">
+                                        <a href="@Url.Action("Detail", "Product", new { id = item.ProductID })">@item.Product.ProductName</a><br>
+                                        @if (item.Color != null)
+                                        {
+                                            <small>Màu: @item.Color.ColorName</small>
+                                        }
+                                    </td>
+                                    <td class="text-left">
+                                        <div class="input-group btn-block quantity">
+                                            <input type="number" name="quantity" value="@item.Quantity" size="1" min="1" max="5" class="form-control quantity-item">
+                                            <span class="input-group-btn">
+                                                <button type="button" data-toggle="tooltip" title="" class="btn item-update" data-original-title="Update" data-id="@item.ProductID" data-color="@item.ColorID" style="background-color: #3498db; color: white; border-color: #3498db;"><i class="fa fa-refresh"></i></button>
+                                                <button type="button" data-toggle="tooltip" title="" class="btn item-remove" onclick="" data-original-title="Remove" data-id="@item.ProductID" data-color="@item.ColorID" style="background-color: #3498db; color: white; border-color: #3498db;"><i class="fa fa-times-circle"></i></button>
+                                            </span>
+                                        </div>
+                                    </td>
+                                    <td class="text-right">@Html.FormatCurrency(item.Price) đ</td>
+                                    <td class="text-right">@Html.FormatCurrency(item.TotalPrice) đ</td>
+                                </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div><!-- /.shopping-cart-table -->	
+                <div class="col-md-4 col-sm-12 cart-shopping-total">
+                    @Html.Action("CartTotal", "Cart")
+                </div><!-- /.cart-shopping-total -->	
+            </div><!-- /.shopping-cart -->
+            }
+            else
+            {
+                <div class="sb-ec-bxc" style="text-align:center;">
+                    <h3 class="sb-ec-bxl txt-normal">Không có sản phẩm nào trong giỏ hàng</h3>
+                    <a class="btn" href="@Url.Action("Index","Home")" style="background-color: #3498db; color: white; border-color: #3498db;">Tiếp tục mua hàng</a>
+                </div>
+            }
+        </div> <!-- /.row -->
+        </div><!-- /.container -->
+</div><!-- /.body-content -->
+
+
+@section masterjs{
+    <style>
+        /* Đảm bảo số tiền thành tiền hiển thị màu đỏ */
+        .cart-shopping-total .cart-grand-total,
+        .cart-shopping-total .cart-grand-total .inner-left-md,
+        .cart-shopping-total .cart-grand-total span {
+            color: #dc3545 !important;
+            font-weight: bold !important;
+        }
+        
+        /* Background màu trắng cho trang Cart */
+        .body-content.outer-top-xs,
+        .body-content.outer-top-xs .container,
+        .body-content.outer-top-xs .row,
+        .body-content.outer-top-xs .shopping-cart,
+        .body-content.outer-top-xs .shopping-cart-table,
+        .body-content.outer-top-xs .cart-shopping-total,
+        .body-content.outer-top-xs .table,
+        .body-content.outer-top-xs .table-responsive {
+            background-color: #ffffff !important;
+        }
+        
+        /* Đảm bảo tất cả nút trong trang Cart có màu xanh dương */
+        .shopping-cart .btn.item-update,
+        .shopping-cart .btn.item-remove,
+        .shopping-cart .btn,
+        .shopping-cart button.btn,
+        .shopping-cart .btn-primary,
+        .cart-shopping-total .btn,
+        .cart-shopping-total .btn-primary,
+        .cart-shopping-total button.btn,
+        .cart-checkout-btn .btn,
+        .cart-checkout-btn a.btn,
+        #btn-apply-coupon,
+        #btn-remove-coupon,
+        .sb-ec-bxc .btn,
+        button[class*="btn"],
+        a[class*="btn"] {
+            background-color: #3498db !important;
+            color: white !important;
+            border-color: #3498db !important;
+        }
+        
+        .shopping-cart .btn.item-update:hover,
+        .shopping-cart .btn.item-update:focus,
+        .shopping-cart .btn.item-update:active,
+        .shopping-cart .btn.item-remove:hover,
+        .shopping-cart .btn.item-remove:focus,
+        .shopping-cart .btn.item-remove:active,
+        .shopping-cart .btn:hover,
+        .shopping-cart .btn:focus,
+        .shopping-cart .btn:active,
+        .shopping-cart button.btn:hover,
+        .shopping-cart button.btn:focus,
+        .shopping-cart button.btn:active,
+        .shopping-cart .btn-primary:hover,
+        .shopping-cart .btn-primary:focus,
+        .shopping-cart .btn-primary:active,
+        .cart-shopping-total .btn:hover,
+        .cart-shopping-total .btn:focus,
+        .cart-shopping-total .btn:active,
+        .cart-shopping-total .btn-primary:hover,
+        .cart-shopping-total .btn-primary:focus,
+        .cart-shopping-total .btn-primary:active,
+        .cart-shopping-total button.btn:hover,
+        .cart-shopping-total button.btn:focus,
+        .cart-shopping-total button.btn:active,
+        .cart-checkout-btn .btn:hover,
+        .cart-checkout-btn .btn:focus,
+        .cart-checkout-btn .btn:active,
+        .cart-checkout-btn a.btn:hover,
+        .cart-checkout-btn a.btn:focus,
+        .cart-checkout-btn a.btn:active,
+        #btn-apply-coupon:hover,
+        #btn-apply-coupon:focus,
+        #btn-apply-coupon:active,
+        #btn-remove-coupon:hover,
+        #btn-remove-coupon:focus,
+        #btn-remove-coupon:active,
+        .sb-ec-bxc .btn:hover,
+        .sb-ec-bxc .btn:focus,
+        .sb-ec-bxc .btn:active {
+            background-color: #2980b9 !important;
+            border-color: #2980b9 !important;
+            color: white !important;
+        }
+    </style>
+    <script>
+        // Coupon functionality
+        $(document).on('click', '#btn-apply-coupon', function() {
+            var couponCode = $('#coupon-input').val().trim();
+            if (couponCode === '') {
+                $('#coupon-message').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> Vui lòng nhập mã giảm giá!</small>');
+                return;
+            }
+            
+            $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+            
+            $.ajax({
+                url: '@Url.Action("ApplyCoupon", "Cart")',
+                type: 'POST',
+                data: { code: couponCode },
+                success: function(response) {
+                    if (response.success) {
+                        $('#coupon-message').html('<small class="text-success"><i class="fa fa-check-circle"></i> ' + response.message + '</small>');
+                        setTimeout(function() {
+                            location.reload();
+                        }, 500);
+                    } else {
+                        $('#coupon-message').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + response.message + '</small>');
+                        $('#btn-apply-coupon').prop('disabled', false).html('<i class="fa fa-tag"></i> Áp dụng');
+                    }
+                },
+                error: function() {
+                    $('#coupon-message').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> Có lỗi xảy ra!</small>');
+                    $('#btn-apply-coupon').prop('disabled', false).html('<i class="fa fa-tag"></i> Áp dụng');
+                }
+            });
+        });
+        
+        $(document).on('click', '#btn-remove-coupon', function() {
+            $(this).prop('disabled', true);
+            $.ajax({
+                url: '@Url.Action("RemoveCoupon", "Cart")',
+                type: 'POST',
+                success: function(response) {
+                    if (response.success) {
+                        location.reload();
+                    }
+                }
+            });
+        });
+        
+        $(document).on('keypress', '#coupon-input', function(e) {
+            if (e.which === 13) {
+                $('#btn-apply-coupon').click();
+            }
+        });
+
+        $(".item-remove").on('click', function () {
+            var item = $(this);
+            
+            bootbox.confirm({
+                size: 'small',
+                className: 'dialog-confirm',
+                title: 'Xóa sản phẩm khỏi giỏ',
+                buttons: {
+                    confirm: {
+                        label: 'Đồng ý',
+                        className: 'btn-success' 
+                    },
+                    cancel: {
+                        label: 'Hủy',
+                        className: 'btn-default'
+                    }
+                },
+                message: "Bạn có muốn xóa <br><b>'" + item.parents().eq(3).find('td:eq(1) a').text() + "'</b> khỏi giỏ chứ?",
+                callback: function (result) {
+                    if (result) {
+                        var productId = item.data('id');
+                        var colorId = item.data('color');
+                        if (colorId == 0) {
+                            $.post("/Cart/RemoveCart", { id: productId }, function (data) {
+                                item.parents("tr").remove();
+                                $("#cart_shop").html(data);
+                                Msg.success('Xóa sản phẩm khỏi giỏ thành công!!!',1500);
+                                updateCart();
+                            });
+                        } else {
+                            $.post("/Cart/RemoveCart", { id: productId, color: colorId }, function (data) {
+                                item.parents("tr").remove();
+                                $("#cart_shop").html(data);
+                                Msg.success('Xóa sản phẩm khỏi giỏ thành công!!!', 1500);
+                                updateCart();
+                            });
+                        }
+                    }
+                }
+            });
+        });
+
+        $('.item-update').on('click', function (e) {
+            e.preventDefault();
+            var btnUpdate = $(this);
+            var product_id = $(this).data('id');
+            var color_id = $(this).data('color');
+            var txtQuantity = $(this).parents().eq(2).find('input.quantity-item');
+            var currQuatity = isNaN(parseInt($(txtQuantity).val())) ? 1 : parseInt($(txtQuantity).val());
+            if (currQuatity == 0) {
+                Msg.error("Vui lòng chọn ít nhất 1 sản phẩm", 1500);
+                currQuatity = 1;
+            }
+            if (currQuatity > 5) {
+                Msg.error("Bạn không được đặt nhiều quá 5 sản phẩm", 1500);
+                currQuatity = 5;
+            }
+            txtQuantity.val(currQuatity);
+            $.post('Cart/UpdateCart', { id: product_id, color: color_id, quantity: currQuatity }, function (data) {
+                //$('.shopping-cart-table tbody tr td:nth-child(5)').text(data);
+                btnUpdate.parents().eq(3).find('td:nth-child(5)').text(data);
+                $.get('Cart/CartTotal', function (data) {
+                    $('.cart-shopping-total').html(data);
+                });
+                $.get('Cart/ShoppingCartView', function (data) {
+                    $("#cart_shop").html(data);
+                });
+            });
+        });
+
+        function updateCart() {
+            var item_count = $(".shopping-cart-table table tbody tr").length;
+            if(item_count == 0){
+                $(".shopping-cart").html('<div class="sb-ec-bxc" style="text-align:center;"> <h3 class="sb-ec-bxl txt-normal">Không có sản phẩm nào trong giỏ hàng</h3> <a class="btn" href="@Url.Action("Index","Home")" style="background-color: #3498db; color: white; border-color: #3498db;">Tiếp tục mua hàng</a> </div>');
+            }
+        }
+    </script>
+}

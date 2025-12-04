@@ -1,0 +1,86 @@
+<aside id="sidebar" class="sidebar">
+    <div class="sidebar-header">
+        <a href="@Url.Action("Index","Home")" class="sidebar-logo">
+            <img src="~/Content/images/logo.png" alt="ShyBox Logo" style="max-height: 40px; margin-right: 10px;" />
+            <span class="sidebar-title">ShyBox Admin</span>
+        </a>
+    </div>
+    
+    <nav class="sidebar-menu">
+        <ul class="sidebar-menu-list">
+            <li class="sidebar-menu-item">
+                <a href="@Url.Action("Index","Home")" class="sidebar-menu-link">
+                    <i class="fa fa-dashboard"></i>
+                    <span class="sidebar-menu-text">Dashboard</span>
+                </a>
+            </li>
+            
+            <li class="sidebar-menu-item has-submenu">
+                <a href="#" class="sidebar-menu-link">
+                    <i class="fa fa-folder"></i>
+                    <span class="sidebar-menu-text">Catalog</span>
+                    <i class="fa fa-chevron-down sidebar-menu-arrow"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index","Product")" class="sidebar-submenu-link">
+                            <i class="fa fa-cube"></i>
+                            <span>Sản phẩm</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index", "Category")" class="sidebar-submenu-link">
+                            <i class="fa fa-list"></i>
+                            <span>Danh mục sản phẩm</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="sidebar-menu-item has-submenu">
+                <a href="#" class="sidebar-menu-link">
+                    <i class="fa fa-shopping-cart"></i>
+                    <span class="sidebar-menu-text">Bán hàng</span>
+                    <i class="fa fa-chevron-down sidebar-menu-arrow"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index", "Order")" class="sidebar-submenu-link">
+                            <i class="fa fa-file-text"></i>
+                            <span>Đơn đặt hàng</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index", "Coupon")" class="sidebar-submenu-link">
+                            <i class="fa fa-ticket"></i>
+                            <span>Mã giảm giá</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+            
+            <li class="sidebar-menu-item has-submenu">
+                <a href="#" class="sidebar-menu-link">
+                    <i class="fa fa-users"></i>
+                    <span class="sidebar-menu-text">Khách hàng</span>
+                    <i class="fa fa-chevron-down sidebar-menu-arrow"></i>
+                </a>
+                <ul class="sidebar-submenu">
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index", "Customer")" class="sidebar-submenu-link">
+                            <i class="fa fa-user"></i>
+                            <span>Danh sách khách hàng</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-submenu-item">
+                        <a href="@Url.Action("Index", "Chat")" class="sidebar-submenu-link">
+                            <i class="fa fa-comments"></i>
+                            <span>Chat với Khách hàng</span>
+                        </a>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </nav>
+</aside>
+

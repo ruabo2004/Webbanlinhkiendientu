@@ -1,0 +1,421 @@
+﻿@model ShippingViewModel
+@{
+    ViewBag.Title = "Thanh toán đơn hàng";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var pCod = (Payment)ViewData["pCod"];
+    var pAtm = (Payment)ViewData["pAtm"];
+    var pOnline = (Payment)ViewData["pOnline"];
+    var pMomo = (Payment)ViewData["pMomo"];
+}
+
+<div class="container">
+    <!-- Breadcrumb Start-->
+    <ul class="progressbar">
+        <li class="active">Đăng nhập</li>
+        <li class="active">Địa chỉ giao hàng</li>
+        <li class="active">Thanh toán & đặt mua</li>
+    </ul>
+    <!-- Breadcrumb End-->
+    
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible" style="margin-top: 15px;">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
+            <strong>Lỗi!</strong> @TempData["ErrorMessage"]
+        </div>
+    }
+    
+    <div class="row" style="margin-bottom:20px;">
+        <div class="col-sm-8">
+            @using (Html.BeginForm("Payment", "Checkout", FormMethod.Post, new { id = "paymentForm" }))
+            {
+                <div class="row">
+                    <div class="col-sm-12">
+                        @Html.HiddenFor(m => m.CustomerID)
+                        @Html.HiddenFor(m => m.FullName)
+                        @Html.HiddenFor(m => m.Phone)
+                        @Html.HiddenFor(m => m.Address)
+                        @Html.HiddenFor(m => m.ProvinceID)
+                        @Html.HiddenFor(m => m.DistrictID)
+                        @Html.HiddenFor(m => m.WardID)
+                        <div class="panel panel-default ship-address">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-ticket"></i> Phương thức thanh toán
+                                </h4>
+                            </div>
+                            <div class="panel-body infomation">
+                                <div class="adr-oms horizontal form" id="form_payment_method">
+                                    @Html.ValidationMessageFor(m => m.PaymentMethod, null, new { @class = "error" })
+                                    @if (pCod != null && pCod.Active)
+                                    {
+                                        <!--COD-->
+                                        <div class="group">
+                                            <div class="adr-oms radio payment-method-1 select-method">
+                                                @Html.RadioButtonFor(m => m.PaymentMethod, @pCod.PaymentID, new { id = "payment_cod" })
+                                                <label for="payment_cod">
+                                                    <div class="adr-oms payment-method">
+                                                        <div class="thumbnail">
+                                                            <img alt="" src="~/Content/images/payment_cod.png">
+                                                        </div>
+                                                        <div class="description">
+                                                            <div class="title">Thanh toán khi nhận hàng (COD)</div>
+                                                            <div class="subtitle">Quý khách sẽ thanh toán bằng tiền mặt
+                                                                hoặc thẻ khi chúng tôi giao hàng cho quý khách.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                    @* @if (pAtm != null && pAtm.Active) *@
+                                    @* { *@
+                                    @*     <!--ATM--> *@
+                                    @*     <div class="group"> *@
+                                    @*         <div class="adr-oms radio payment-method-4 select-method"> *@
+                                    @*             @Html.RadioButtonFor(m => m.PaymentMethod, @pAtm.PaymentID, new { id = "payment_atm" }) *@
+                                    @*             <label for="payment_atm"> *@
+                                    @*                 <div class="adr-oms payment-method"> *@
+                                    @*                     <div class="thumbnail"> *@
+                                    @*                         <img alt="" src="~/Content/images/payment_atm.png"> *@
+                                    @*                     </div> *@
+                                    @*                     <div class="description"> *@
+                                    @*                         <div class="title">Thanh toán bằng thẻ ATM / Chuyển khoản *@
+                                    @*                         </div> *@
+                                    @*                         <div class="subtitle"> *@
+                                    @*                             Thẻ ATM của bạn cần đăng ký sử dụng dịch vụ Internet *@
+                                    @*                             Banking. *@
+                                    @*                             <br> *@
+                                    @*                             <span>Bạn sẽ được chuyển link để thanh toán.</span> *@
+                                    @*                         </div> *@
+                                    @*                     </div> *@
+                                    @*                 </div> *@
+                                    @*             </label> *@
+                                    @*         </div> *@
+                                    @*     </div> *@
+                                    @* } *@
+                                    @* @if (pAtm != null && pOnline.Active) *@
+                                    @* { *@
+                                    @*     <!--ONLINE PAYMENT--> *@
+                                    @*     <div class="group"> *@
+                                    @*         <div class="adr-oms radio payment-method-6 select-method"> *@
+                                    @*             @Html.RadioButtonFor(m => m.PaymentMethod, @pOnline.PaymentID, new { id = "payment_visa" }) *@
+                                    @*             <label for="payment_visa"> *@
+                                    @*                 <div class="adr-oms payment-method"> *@
+                                    @*                     <div class="thumbnail"> *@
+                                    @*                         <img alt="" src="~/Content/images/payment_visa.png"> *@
+                                    @*                     </div> *@
+                                    @*                     <div class="description"> *@
+                                    @*                         <div class="title">Thanh toán trực tuyến bằng thẻ quốc tế / *@
+                                    @*                             nội địa *@
+                                    @*                         </div> *@
+                                    @*                         <div class="subtitle"> *@
+                                    @*                             Hỗ trợ Credit, Debit, thẻ nội địa. *@
+                                    @*                             <br> *@
+                                    @*                             <span>Bạn sẽ được chuyển tới OnePay để thanh toán.</span> *@
+                                    @*                         </div> *@
+                                    @*                     </div> *@
+                                    @*                 </div> *@
+                                    @*             </label> *@
+                                    @*         </div> *@
+                                    @*     </div> *@
+                                    @* } *@
+                                    @if (pMomo != null && pMomo.Active)
+                                    {
+                                        <!--MOMO-->
+                                        <div class="group">
+                                            <div class="adr-oms radio payment-method-1 select-method">
+                                                @Html.RadioButtonFor(m => m.PaymentMethod, @pMomo.PaymentID, new { id = "payment_momo" })
+                                                <label for="payment_momo">
+                                                    <div class="adr-oms payment-method">
+                                                        <div class="thumbnail">
+                                                            <img alt="" src="~/Content/images/payment_atm.png">
+                                                        </div>
+                                                        <div class="description">
+                                                            <div class="title">Thanh toán bằng momo)</div>
+                                                            <div class="subtitle">Bạn sẽ được chuyển tới momo để thanh toán.
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="panel panel-default order-comment">
+                            <div class="panel-heading">
+                                <h4 class="panel-title">
+                                    <i class="fa fa-ticket"></i> Thông tin thêm
+                                </h4>
+                            </div>
+                            <div class="panel-body more-info">
+                                <div class="form-group">
+                                    @Html.LabelFor(m => m.Comment, new { @class = "col-md-2 control-label" })
+                                    <div class="col-md-10">
+                                        @Html.TextAreaFor(m => m.Comment, new { @class = "form-control", rows = "5" })
+                                        @Html.ValidationMessageFor(m => m.Comment)
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="pull-right">
+                            <button id="checkout" type="submit" class="btn btn-labeled btn-danger">
+                                <span class="btn-label"><i class="fa fa-credit-card add-cart"></i></span>Thanh toán
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+        <div class="col-sm-4">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="panel panel-default ship-address">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <i class="fa fa-ticket"></i> Địa chỉ giao hàng
+                            </h4>
+                        </div>
+                        <div class="panel-body infomation">
+                            <h6>@Model.FullName</h6>
+                            <p>
+                                Địa chỉ: @Model.Address
+                                @if (Model.Ward != null)
+                                {
+                                    <text>, @Model.Ward.Type @Model.Ward.WardName</text>
+                                }
+                                @if (Model.District != null)
+                                {
+                                    <text>, @Model.District.Type @Model.District.DistrictName</text>
+                                }
+                                @if (Model.Province != null)
+                                {
+                                    <text>, @Model.Province.Type @Model.Province.ProvinceName</text>
+                                }
+                                <br/> SĐT: @Model.Phone
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-sm-12">
+                    <div class="panel panel-default ship-address">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <i class="fa fa-ticket"></i> Đơn hàng (@ShoppingCart.Instance.GetCount() sản phẩm)
+                            </h4>
+                        </div>
+                        <div class="panel-body cart">
+                            <div class="checkout_product">
+                                @foreach (var item in ShoppingCart.Instance.Items)
+                                {
+                                    <div class="item">
+                                        <p class="title"><strong>@item.Quantity x </strong><a
+                                                href="@Url.Action("Detail", "Product", new { id = item.ProductID })"
+                                                target="_blank">@item.Product.ProductName</a></p>
+                                        <p class="price">
+                                            <span>@Html.FormatCurrency(item.Price) đ</span>
+                                        </p>
+                                    </div>
+                                }
+                            </div>
+                            
+                            @{
+                                var subtotal = ShoppingCart.Instance.GetTotal();
+                                long rankDiscount = 0;
+                                long couponDiscount = 0;
+                                string couponCode = "";
+                                long finalTotal = subtotal;
+                                
+                                // Member Rank Discount
+                                if (UserManager.CurrentCustomer != null && UserManager.CurrentCustomer.MemberRank != null && UserManager.CurrentCustomer.MemberRank.DiscountPercent > 0)
+                                {
+                                    rankDiscount = (long)(subtotal * (decimal)UserManager.CurrentCustomer.MemberRank.DiscountPercent / 100M);
+                                }
+                                
+                                // Coupon Discount
+                                if (Session["CouponCode"] != null)
+                                {
+                                    couponCode = Session["CouponCode"].ToString();
+                                    if (Session["CouponDiscount"] != null)
+                                    {
+                                        couponDiscount = Convert.ToInt64(Session["CouponDiscount"]);
+                                    }
+                                }
+                                
+                                finalTotal = subtotal - rankDiscount - couponDiscount;
+                                if (finalTotal < 0) 
+                                {
+                                    finalTotal = 0;
+                                }
+                            }
+                            
+                            @* Member Rank Discount *@
+                            @if (UserManager.CurrentCustomer != null && UserManager.CurrentCustomer.MemberRank != null && UserManager.CurrentCustomer.MemberRank.DiscountPercent > 0)
+                            {
+                                var rank = UserManager.CurrentCustomer.MemberRank;
+                                
+                                var gradientColor = "";
+                                switch (rank.RankID)
+                                {
+                                    case 1:
+                                        gradientColor = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                                        break;
+                                    case 2:
+                                        gradientColor = "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)";
+                                        break;
+                                    case 3:
+                                        gradientColor = "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)";
+                                        break;
+                                    case 4:
+                                        gradientColor = "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)";
+                                        break;
+                                    case 5:
+                                        gradientColor = "linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)";
+                                        break;
+                                    default:
+                                        gradientColor = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                                        break;
+                                }
+                                
+                                <hr style="margin: 10px 0;" />
+                                <div class="text-right" style="background: @gradientColor; padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                    <p style="color: white; margin: 5px 0; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                        <i class="@rank.GetIconClass()"></i> <strong>ƯU ĐÃI HẠNG @rank.RankName.ToUpper()</strong>
+                                    </p>
+                                    <p style="color: white; margin: 5px 0; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                        Giảm @rank.DiscountPercent%: <strong style="font-size: 16px;">- @Html.FormatCurrency(rankDiscount) đ</strong>
+                                    </p>
+                                </div>
+                            }
+                            
+                            @* Coupon Form *@
+                            <div style="margin: 15px 0;">
+                                @if (string.IsNullOrEmpty(couponCode))
+                                {
+                                    <div class="input-group">
+                                        <input type="text" id="coupon-input-payment" class="form-control" placeholder="Nhập mã giảm giá..." style="height: 40px;">
+                                        <span class="input-group-btn">
+                                            <button class="btn btn-success" id="btn-apply-coupon-payment" type="button" style="height: 40px;">
+                                                <i class="fa fa-tag"></i> Áp dụng
+                                            </button>
+                                        </span>
+                                    </div>
+                                    <div id="coupon-message-payment" style="margin-top: 5px;"></div>
+                                }
+                                else
+                                {
+                                    <div class="text-right" style="background: linear-gradient(135deg, #28a745 0%, #20c997 100%); padding: 12px 15px; border-radius: 8px; margin-bottom: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                                            <div style="flex: 1;">
+                                                <p style="color: white; margin: 5px 0; font-size: 13px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                                    <i class="fa fa-ticket"></i> <strong>MÃ: @couponCode</strong>
+                                                </p>
+                                                <p style="color: white; margin: 5px 0; font-size: 14px; text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                                                    <strong style="font-size: 16px;">- @Html.FormatCurrency(couponDiscount) đ</strong>
+                                                </p>
+                                            </div>
+                                            <button class="btn btn-sm btn-danger" id="btn-remove-coupon-payment" type="button" style="padding: 5px 10px;">
+                                                <i class="fa fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            
+                            @* Total *@
+                            @if (rankDiscount > 0 || couponDiscount > 0)
+                            {
+                                <p class="total2 text-right">
+                                    Thành tiền:
+                                    <span style="color: #28a745; font-weight: bold;">@Html.FormatCurrency(finalTotal) đ</span>
+                                </p>
+                                <p class="text-right" style="font-size: 12px; color: #999;">
+                                    <del>@Html.FormatCurrency(subtotal) đ</del>
+                                </p>
+                            }
+                            else
+                            {
+                                <p class="total2 text-right">
+                                    Thành tiền:
+                                    <span>@Html.FormatCurrency(subtotal) đ</span>
+                                </p>
+                            }
+                            
+                            <p class="text-right">
+                                <i>(Đã bao gồm VAT)</i>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+<script>
+$(document).ready(function() {
+    // Apply Coupon
+    $('#btn-apply-coupon-payment').click(function() {
+        var couponCode = $('#coupon-input-payment').val().trim();
+        if (couponCode === '') {
+            $('#coupon-message-payment').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> Vui lòng nhập mã giảm giá!</small>');
+            return;
+        }
+        
+        $(this).prop('disabled', true).html('<i class="fa fa-spinner fa-spin"></i> Đang xử lý...');
+        
+        $.ajax({
+            url: '@Url.Action("ApplyCoupon", "Cart")',
+            type: 'POST',
+            data: { code: couponCode },
+            success: function(response) {
+                if (response.success) {
+                    $('#coupon-message-payment').html('<small class="text-success"><i class="fa fa-check-circle"></i> ' + response.message + '</small>');
+                    setTimeout(function() {
+                        location.reload();
+                    }, 500);
+                } else {
+                    $('#coupon-message-payment').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> ' + response.message + '</small>');
+                    $('#btn-apply-coupon-payment').prop('disabled', false).html('<i class="fa fa-tag"></i> Áp dụng');
+                }
+            },
+            error: function() {
+                $('#coupon-message-payment').html('<small class="text-danger"><i class="fa fa-exclamation-circle"></i> Có lỗi xảy ra!</small>');
+                $('#btn-apply-coupon-payment').prop('disabled', false).html('<i class="fa fa-tag"></i> Áp dụng');
+            }
+        });
+    });
+    
+    // Remove Coupon
+    $('#btn-remove-coupon-payment').click(function() {
+        $(this).prop('disabled', true);
+        $.ajax({
+            url: '@Url.Action("RemoveCoupon", "Cart")',
+            type: 'POST',
+            success: function(response) {
+                if (response.success) {
+                    location.reload();
+                }
+            }
+        });
+    });
+    
+    // Press Enter to apply coupon
+    $('#coupon-input-payment').keypress(function(e) {
+        if (e.which === 13) {
+            $('#btn-apply-coupon-payment').click();
+        }
+    });
+});
+</script>
+}
+

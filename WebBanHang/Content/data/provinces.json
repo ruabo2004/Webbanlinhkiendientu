@@ -1,0 +1,12 @@
+[
+  { "province_id": 1, "province_name": "Hà Nội", "province_type": "TP" },
+  { "province_id": 2, "province_name": "Hồ Chí Minh", "province_type": "TP" },
+  { "province_id": 3, "province_name": "Đà Nẵng", "province_type": "TP" },
+  { "province_id": 4, "province_name": "Hà Nội", "province_type": "TP" },
+  { "province_id": 5, "province_name": "Cần Thơ", "province_type": "TP" },
+  { "province_id": 6, "province_name": "Đắk Lắk", "province_type": "Tỉnh" },
+  { "province_id": 7, "province_name": "Khánh Hòa", "province_type": "Tỉnh" },
+  { "province_id": 8, "province_name": "Nghệ An", "province_type": "Tỉnh" },
+  { "province_id": 9, "province_name": "Bình Dương", "province_type": "Tỉnh" },
+  { "province_id": 10, "province_name": "Hải Dương", "province_type": "Tỉnh" }
+]

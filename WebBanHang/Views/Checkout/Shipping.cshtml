@@ -1,0 +1,231 @@
+﻿@model ShippingViewModel
+@{
+    ViewBag.Title = "Shipping";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var user = UserManager.CurrentCustomer;
+    var provinces = (List<Province>)ViewData["Provinces"];
+    var provincesListItem = provinces.Select(s => new SelectListItem
+    {
+        Value = s.ProvinceID.ToString(),
+        Text = StringUtils.ShortCity(s.Type) + " " + s.ProvinceName
+    });
+}
+
+<div class="container">
+    <!-- Breadcrumb Start-->
+    <ul class="progressbar">
+        <li class="active">Đăng nhập</li>
+        <li class="active">Địa chỉ giao hàng</li>
+        <li>Thanh toán & đặt mua</li>
+    </ul>
+    <!-- Breadcrumb End-->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h4 class="panel-title"><i class="fa fa-truck"></i> Chọn địa chỉ giao hàng</h4>
+                </div>
+                <div class="panel-body">
+                    @using(Html.BeginForm("Shipping","Checkout",FormMethod.Post)){
+                        <h5 class="visible-lg-block">
+                            Chọn địa chỉ giao hàng có sẵn bên dưới:
+                        </h5>
+                        <div class="row row-address-list">
+
+                            <div class="col-lg-6 col-md-6 col-sm-6 item" id="item-1207154">
+                                <div class="panel panel-default address-item is-default">
+                                    <div class="panel-body">
+                                        <p class="name">Tên: @user.FullName</p>
+                                        @Html.Hidden("CustomerID",user.CustomerID)
+                                        @Html.Hidden("FullName", user.FullName)
+                                        @if(user.ProvinceID == null){
+                                            <p class="action">
+                                                <a href="@Url.Action("Profile","Customer",new { return_url = Request.Url.AbsoluteUri.ToString().ToLower() })" type="button" class="btn btn-primary btn-custom1 edit-address" data-id="1207154">Cập nhật địa chỉ</a>
+                                            </p>
+                                        }
+                                        else
+                                        {
+                                            <p class="address">
+                                            Địa chỉ: @user.Address@(user.Ward != null ? ", " + user.Ward.Type + " " + user.Ward.WardName : "")@(user.District != null ? ", " + user.District.Type + " " + user.District.DistrictName : "")@(user.Province != null ? ", " + user.Province.Type + " " + user.Province.ProvinceName : "")
+                                            </p>
+                                            @Html.Hidden("Address", user.Address)
+                                            @Html.Hidden("ProvinceID", user.ProvinceID)
+                                            @Html.Hidden("DistrictID", user.DistrictID)
+                                            @Html.Hidden("WardID", user.WardID)
+                                            <p class="phone">Điện thoại: @((user.Phone.Length > 0 ? user.Phone : ""))</p>
+                                            @Html.Hidden("Phone", user.Phone)
+                                            <p class="action">
+                                                <input type="submit" class="btn btn-primary btn-custom1 saving-address is-blue" value="Giao đến địa chỉ này">
+                                                <a href="@Url.Action("Profile", "Customer", new { return_url = Request.Url.AbsoluteUri.ToString().ToLower() })" type="button" class="btn btn-primary btn-custom1 edit-address" data-id="1207154">Sửa</a>
+                                            </p>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                        <p class="other">
+                            Bạn muốn giao hàng đến địa chỉ khác?
+                            <a href="javascript:void(0)" id="addNewAddress">
+                               Đã thêm địa chỉ giao hàng mới
+                            </a>
+                        </p>
+                    }
+                </div>
+            </div>
+            <div class="panel panel-default address-form is-edit" style="display: none;">
+                <div class="panel-heading">Giao hàng tới địa điểm khác</div>
+                <div class="panel-body">
+                            @using (Html.BeginForm("Shipping", "Checkout", FormMethod.Post, new { @class = "form-horizontal bv-form", id = "address-info" })) { 
+                                <div class="form-group row">
+                                    @Html.Hidden("CustomerID", user.CustomerID)
+                                    <label for="FullName" class="col-lg-4 control-label visible-lg-block">Họ tên </label>
+                                    <div class="col-lg-4 input-wrap has-feedback">
+                                        @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", id = "full-name",placeholder="Nhập họ tên" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="telephone" class="col-lg-4 control-label visible-lg-block">Điện thoại di động</label>
+                                    <div class="col-lg-3 input-wrap has-feedback">
+                                        @Html.TextBoxFor(m => m.Phone, new { @class = "form-control", id = "phone", placeholder = "Nhập số điện thoại" })
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group row">
+                                    <label for="street" class="col-lg-4 control-label visible-lg-block">Địa chỉ</label>
+                                    <div class="col-lg-4 input-wrap has-feedback">
+                                        @Html.TextBoxFor(m => m.Address, new { @class = "form-control", id = "address", placeholder = "Nhập số nhà" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="region_id" class="col-lg-4 control-label visible-lg-block">Tỉnh/Thành phố</label>
+                                    <div class="col-lg-4 input-wrap has-feedback">
+                                        @Html.DropDownListFor(model => model.ProvinceID,
+                                    new SelectList(provincesListItem, "Value", "Text"), "Xin vui lòng chọn Tỉnh/Tp",
+                                new { @class = "form-control input-md address-choose", id = "drop-province" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="city_id" class="col-lg-4 control-label visible-lg-block">Quận/Huyện</label>
+                                    <div class="col-lg-4 input-wrap has-feedback">
+                                        @Html.DropDownListFor(model => model.DistrictID, Enumerable.Empty<SelectListItem>(), "Xin vui lòng chọn Quận/Huyện",
+                             new { @class = "form-control input-md address-choose", id = "drop-district" })
+                                    </div>
+                                </div>
+
+                                <div class="form-group row">
+                                    <label for="city_id" class="col-lg-4 control-label visible-lg-block">Phường/Xã</label>
+                                    <div class="col-lg-4 input-wrap has-feedback">
+                                        @Html.DropDownListFor(model => model.WardID,
+                                          Enumerable.Empty<SelectListItem>(), "Xin vui lòng chọn Phường/Xã",
+                                    new { @class = "form-control input-md address-choose", id = "drop-ward" })
+                                        <small class="help-block" style="display: none;">Vui lòng chọn Quận/Huyện</small>
+                                    </div>
+                                </div>
+
+                                
+                                <div class="form-group row end">
+                                    <div class="col-lg-offset-4 col-lg-8">
+                                        <button id="btn-address" type="submit" class="btn btn-primary btn-custom3" value="ship">Giáao tới địa chỉ này</button>
+                                    </div>
+                                </div>
+                        }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+@section masterjs{
+<script>
+    $('#addNewAddress').on('click', function (event) {
+        event.preventDefault();
+        if ($('.address-form').css('display') == 'none') {
+            $('.address-form').css('display','block');
+        }
+    });
+
+
+    $('.address-choose').change(function () {
+        var id = this.id;
+        var value = $(this).val();
+        if (id == 'drop-province') {
+            $('#drop-district').html('<option value="">Xin vui lòng chọn Quận/Huyện</option>');
+            $('#drop-ward').html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+            $.getJSON("/AppApi/District_In_Province", { id: value }, function (data) {
+                if (data.status == 'ok') {
+                    $.each(data.districts, function (i, item) {
+                        $('#drop-district').append('<option value="' + item.district_id + '">' + item.district_type + ' ' + item.district_name + '</option>');
+                    });
+                }
+            });
+        } else if (id == 'drop-district') {
+            $('#drop-ward').html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+            $.getJSON("/AppApi/Ward_In_District", { id: value }, function (data) {
+                if (data.status == 'ok') {
+                    $.each(data.wards, function (i, item) {
+                        $('#drop-ward').append('<option value="' + item.ward_id + '">' + item.ward_type + ' ' + item.ward_name + '</option>');
+                    });
+                }
+            });
+        }
+    });
+
+    //Validate
+    $('#address-info').validate({
+        rules: {
+            FullName: {
+                required: true,
+                maxlength: 50
+            },
+            Phone: {
+                required: true,
+                regex: /^[0][0-9]{9,10}/
+            },
+            Address: {
+                required: true,
+                maxlength: 100
+            },
+            ProvinceID: {
+                required: true
+            },
+            DistrictID: {
+                required: true
+            },
+            WardID: {
+                required: true
+            }
+        },
+        messages: {
+            FullName: {
+                required: 'Vui lòng nhập tên',
+                maxlength: 'Độ dài tối đa của tên chỉ được 50 ký tự'
+            },
+            Phone: {
+                required:'Vui lòng nhập số điện thoại',
+                regex: 'Số điện thoại không hợp lệ'
+            },
+            Address: {
+                required: 'Vui lòng nhập địa chỉ'
+            },
+            ProvinceID: {
+                required: 'Bạn chưa chọn Tỉnh/TP'
+            },
+            DistrictID: {
+                required: 'Bạn chưa chọn Quận/Huyện'
+            },
+            WardID: {
+                required: 'Bạn chưa chọn Phường/Xã'
+            }
+        },
+        submitHandler: function (form) {
+            form.submit();
+        }
+    });
+
+</script>    
+}

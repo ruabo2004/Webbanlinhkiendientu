@@ -1,0 +1,90 @@
+using AutoMapper;
+using System.Dynamic;
+using System.Linq;
+using System.Security.Principal;
+using System.Web;
+using System.Web.Mvc;
+using System.Web.Script.Serialization;
+using System.Web.Security;
+using WebBanLinhKienDienTu.Core.RepositoryModel;
+using WebBanLinhKienDienTu.Models;
+using WebBanLinhKienDienTu.Utils;
+using System.Collections.Generic;
+
+namespace WebBanLinhKienDienTu.Core
+{
+    public class BaseController : Controller
+    {
+        protected UnitOfWork Repository { get; set; }
+        protected IMapper Mapper { get; set; }
+
+        protected ShoppingCart Cart
+        {
+            get { return ShoppingCart.Instance; }
+        }
+
+        public BaseController()
+        {
+            ecommerceEntities entity = new ecommerceEntities();
+            Repository = new UnitOfWork(entity);
+            Mapper = AutoMapperConfig.MapperConfiguration.CreateMapper();
+        }
+
+        protected override void OnActionExecuting(ActionExecutingContext filterContext)
+        {
+            // Đảm bảo response encoding UTF-8
+            filterContext.HttpContext.Response.ContentEncoding = System.Text.Encoding.UTF8;
+            filterContext.HttpContext.Response.Charset = "utf-8";
+            
+            //  set viewbag data
+            dynamic viewBagData = new ExpandoObject();
+            viewBagData.Config = Repository.Bind<ConfigRepository>()
+                                        .FetchAll()
+                                        .ToDictionary(item => item.ConfigName, item => item.Value)
+                                        .WithDefaultValue("none");
+            ViewBag.Data = viewBagData;
+
+            // Ensure provinces list is available to views that render address dropdowns
+            try
+            {
+                var provinces = Repository.Bind<ProvinceRepository>().FetchAll().OrderBy(p => p.ProvinceName).ToList();
+                ViewData["Provinces"] = provinces;
+            }
+            catch
+            {
+                // If repository call fails, ensure view has an empty list to avoid null reference in views
+                ViewData["Provinces"] = new List<Province>();
+            }
+
+            base.OnActionExecuting(filterContext);
+        }
+
+        protected override void Initialize(System.Web.Routing.RequestContext requestContext)
+        {
+            base.Initialize(requestContext);
+        }
+
+        protected override void OnAuthentication(System.Web.Mvc.Filters.AuthenticationContext filterContext)
+        {
+            base.OnAuthentication(filterContext);
+            HttpCookie authCookie = Request.Cookies[FormsAuthentication.FormsCookieName];
+            if (authCookie != null)
+            {
+                FormsAuthenticationTicket authTicket = FormsAuthentication.Decrypt(authCookie.Value);
+                JavaScriptSerializer js = new JavaScriptSerializer();
+                int customerID = js.Deserialize<int>(authTicket.UserData);
+                Customer customer = Repository.Customer.FindById(customerID);
+                if (customer == null) return;
+                var identity = new GenericIdentity(authTicket.Name, "Customer");
+                CustomerPrincipal principal = new CustomerPrincipal(identity);
+                principal.UserData = customer;
+                filterContext.HttpContext.User = principal;
+            }
+            else
+            {
+                var principal = new GenericPrincipal(new GenericIdentity(""), null);
+                filterContext.HttpContext.User = principal;
+            }
+        }
+    }
+}

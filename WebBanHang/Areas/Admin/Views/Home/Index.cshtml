@@ -1,0 +1,740 @@
+﻿
+@{
+    ViewBag.Title = "Dashboard";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutPage.cshtml";
+    var orders = ViewBag.Orders as IEnumerable<Order> ?? new List<Order>();
+    var products = ViewBag.Products as IEnumerable<Product> ?? new List<Product>();
+    var customers = ViewBag.Customers as IEnumerable<Customer> ?? new List<Customer>();
+    long totalRevenue = 0;
+    if (orders != null && orders.Any())
+    {
+        var paidOrders = orders.Where(i => i != null && i.Paid);
+        if (paidOrders.Any())
+        {
+            totalRevenue = paidOrders.Sum(i => (long?)i.TotalPrice) ?? 0;
+        }
+    }
+}
+
+<div class="container">
+    <!-- Page-Title -->
+
+
+    <div class="row">
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-layers pull-xs-right text-muted"></i>
+                <h6 class="text-muted text-uppercase m-b-20">Đơn đặt hàng</h6>
+                <h2 class="m-b-20"><span data-plugin="counterup">@(orders != null ? orders.Count() : 0)</span> đơn</h2>
+                <span class="label label-success"> @(orders != null ? orders.Where(i => !i.Paid).Count() : 0) đơn </span> <span
+                    class="text-muted">chưa thanh toán</span>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-paypal pull-xs-right text-muted"></i>
+                <h6 class="text-muted text-uppercase m-b-20">Doanh thu</h6>
+                <h2 class="m-b-20">
+                    <span data-plugin="counterup">@totalRevenue</span> đ
+                </h2>
+                <span class="label label-success"> +10% </span> <span class="text-muted">so với tháng trước</span>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-chart pull-xs-right text-muted"></i>
+                <h6 class="text-muted text-uppercase m-b-20">Sản phẩm</h6>
+                <h2 class="m-b-20"><span data-plugin="counterup">@(products != null ? products.Count() : 0)</span> sản phẩm</h2>
+                <span class="label label-pink"> 0 </span> <span class="text-muted">sản phẩm mới trong tháng</span>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-md-6 col-lg-6 col-xl-3">
+            <div class="card-box tilebox-one">
+                <i class="icon-rocket pull-xs-right text-muted"></i>
+                <h6 class="text-muted text-uppercase m-b-20">Khách hàng</h6>
+                <h2 class="m-b-20"><span data-plugin="counterup">@(customers != null ? customers.Count() : 0)</span></h2>
+                <span class="label label-warning"> +89% </span> <span
+                    class="text-muted">khách hàng mới trong tháng</span>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    <!-- Charts Row -->
+    <div class="row">
+        <div class="col-xs-12 col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title m-t-0 m-b-20">Doanh thu 7 ngày gần nhất</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title m-t-0 m-b-20">Số đơn hàng 7 ngày gần nhất</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="orderCountChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-xs-12 col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title m-t-0 m-b-20">Phân bổ trạng thái đơn hàng</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="orderStatusChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xs-12 col-lg-6">
+            <div class="card-box">
+                <h4 class="header-title m-t-0 m-b-20">Top 10 sản phẩm bán chạy</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="topProductsChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    <div class="row">
+        <div class="col-xs-12 col-lg-12">
+            <div class="card-box">
+                <h4 class="header-title m-t-0 m-b-20">Doanh thu theo tháng (6 tháng gần nhất)</h4>
+                <div style="position: relative; height: 300px;">
+                    <canvas id="monthlyRevenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end row -->
+
+    @* <div class="row"> *@
+    @*     <div class="col-xs-12 col-lg-12 col-xl-8"> *@
+    @*         <div class="card-box"> *@
+    @* *@
+    @*             <h4 class="header-title m-t-0 m-b-20">Thống kê</h4> *@
+    @* *@
+    @*             <div class="text-xs-center"> *@
+    @*                 <ul class="list-inline chart-detail-list m-b-0"> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #3db9dc;"><i class="zmdi zmdi-circle-o m-r-5"></i>Đồ ăn</h6> *@
+    @*                     </li> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #1bb99a;"><i class="zmdi zmdi-triangle-up m-r-5"></i>Đồ uống</h6> *@
+    @*                     </li> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #818a91;"><i class="zmdi zmdi-square-o m-r-5"></i>Chè</h6> *@
+    @*                     </li> *@
+    @*                 </ul> *@
+    @*             </div> *@
+    @* *@
+    @*             <div id="morris-bar-stacked" *@
+    @*                  style="height: 320px; position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"> *@
+    @*                 <svg height="320" version="1.1" width="750" xmlns="http://www.w3.org/2000/svg" *@
+    @*                      xmlns:xlink="http://www.w3.org/1999/xlink" *@
+    @*                      style="overflow: hidden; position: relative; left: -0.046875px;"> *@
+    @*                     <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc> *@
+    @*                     <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs> *@
+    @*                     <text x="32.515625" y="281" text-anchor="end" font-family="sans-serif" font-size="12px" *@
+    @*                           stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan> *@
+    @*                     </text> *@
+    @*                     <path fill="none" stroke="#eeeeee" d="M45.015625,281H725" stroke-width="0.5" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="32.515625" y="217" text-anchor="end" font-family="sans-serif" font-size="12px" *@
+    @*                           stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">100</tspan> *@
+    @*                     </text> *@
+    @*                     <path fill="none" stroke="#eeeeee" d="M45.015625,217H725" stroke-width="0.5" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="32.515625" y="153" text-anchor="end" font-family="sans-serif" font-size="12px" *@
+    @*                           stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">200</tspan> *@
+    @*                     </text> *@
+    @*                     <path fill="none" stroke="#eeeeee" d="M45.015625,153H725" stroke-width="0.5" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="32.515625" y="89" text-anchor="end" font-family="sans-serif" font-size="12px" *@
+    @*                           stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">300</tspan> *@
+    @*                     </text> *@
+    @*                     <path fill="none" stroke="#eeeeee" d="M45.015625,89H725" stroke-width="0.5" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="32.515625" y="25" text-anchor="end" font-family="sans-serif" font-size="12px" *@
+    @*                           stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">400</tspan> *@
+    @*                     </text> *@
+    @*                     <path fill="none" stroke="#eeeeee" d="M45.015625,25H725" stroke-width="0.5" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="694.0916193181819" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2015</tspan> *@
+    @*                     </text> *@
+    @*                     <text x="570.4580965909091" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2013</tspan> *@
+    @*                     </text> *@
+    @*                     <text x="446.8245738636364" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2011</tspan> *@
+    @*                     </text> *@
+    @*                     <text x="323.1910511363636" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2009</tspan> *@
+    @*                     </text> *@
+    @*                     <text x="199.5575284090909" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2007</tspan> *@
+    @*                     </text> *@
+    @*                     <text x="75.92400568181819" y="293.5" text-anchor="middle" font-family="sans-serif" *@
+    @*                           font-size="12px" stroke="none" fill="#888888" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" *@
+    @*                           font-weight="normal" transform="matrix(1,0,0,1,0,7)"> *@
+    @*                         <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2005</tspan> *@
+    @*                     </text> *@
+    @*                     <rect x="63.56065340909091" y="252.2" width="24.72670454545455" height="28.80000000000001" *@
+    @*                           rx="0" ry="0" fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="63.56065340909091" y="137" width="24.72670454545455" height="115.19999999999999" rx="0" *@
+    @*                           ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="63.56065340909091" y="73" width="24.72670454545455" height="64" rx="0" ry="0" *@
+    @*                           fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="125.37741477272729" y="233" width="24.72670454545455" height="48" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="125.37741477272729" y="191.4" width="24.72670454545455" height="41.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="125.37741477272729" y="140.20000000000002" width="24.72670454545455" *@
+    @*                           height="51.19999999999999" rx="0" ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="187.19417613636367" y="217" width="24.72670454545455" height="64" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="187.19417613636367" y="159.4" width="24.72670454545455" height="57.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="187.19417613636367" y="123.56" width="24.72670454545455" height="35.84" rx="0" ry="0" *@
+    @*                           fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="249.0109375" y="233" width="24.72670454545455" height="48" rx="0" ry="0" fill="#3db9dc" *@
+    @*                           stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="249.0109375" y="191.4" width="24.72670454545455" height="41.599999999999994" rx="0" *@
+    @*                           ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="249.0109375" y="134.44" width="24.72670454545455" height="56.96000000000001" rx="0" *@
+    @*                           ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="310.8276988636364" y="217" width="24.72670454545455" height="64" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="310.8276988636364" y="159.4" width="24.72670454545455" height="57.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="310.8276988636364" y="82.6" width="24.72670454545455" height="76.80000000000001" rx="0" *@
+    @*                           ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="372.6444602272727" y="233" width="24.72670454545455" height="48" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="372.6444602272727" y="191.4" width="24.72670454545455" height="41.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="372.6444602272727" y="121" width="24.72670454545455" height="70.4" rx="0" ry="0" *@
+    @*                           fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="434.4612215909091" y="249" width="24.72670454545455" height="32" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="434.4612215909091" y="223.4" width="24.72670454545455" height="25.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="434.4612215909091" y="169" width="24.72670454545455" height="54.400000000000006" rx="0" *@
+    @*                           ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="496.27798295454545" y="233" width="24.72670454545455" height="48" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="496.27798295454545" y="191.4" width="24.72670454545455" height="41.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="496.27798295454545" y="158.12" width="24.72670454545455" height="33.28" rx="0" ry="0" *@
+    @*                           fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="558.0947443181819" y="249" width="24.72670454545455" height="32" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="558.0947443181819" y="223.4" width="24.72670454545455" height="25.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="558.0947443181819" y="174.12" width="24.72670454545455" height="49.28" rx="0" ry="0" *@
+    @*                           fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="619.9115056818182" y="233" width="24.72670454545455" height="48" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="619.9115056818182" y="191.4" width="24.72670454545455" height="41.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="619.9115056818182" y="133.8" width="24.72670454545455" height="57.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="681.7282670454546" y="217" width="24.72670454545455" height="64" rx="0" ry="0" *@
+    @*                           fill="#3db9dc" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="681.7282670454546" y="159.4" width="24.72670454545455" height="57.599999999999994" *@
+    @*                           rx="0" ry="0" fill="#1bb99a" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                     <rect x="681.7282670454546" y="76.20000000000002" width="24.72670454545455" *@
+    @*                           height="83.19999999999999" rx="0" ry="0" fill="#ebeff2" stroke="none" fill-opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect> *@
+    @*                 </svg> *@
+    @*                 <div class="morris-hover morris-default-style" style="display: none;"></div> *@
+    @*             </div> *@
+    @* *@
+    @*         </div> *@
+    @*     </div><!-- end col--> *@
+    @* *@
+    @*     <div class="col-xs-12 col-lg-12 col-xl-4"> *@
+    @*         <div class="card-box"> *@
+    @* *@
+    @*             <h4 class="header-title m-t-0 m-b-30">Trends Monthly</h4> *@
+    @* *@
+    @*             <div class="text-xs-center m-b-20"> *@
+    @*                 <div class="btn-group" role="group" aria-label="Basic example"> *@
+    @*                     <button type="button" class="btn btn-sm btn-secondary">Today</button> *@
+    @*                     <button type="button" class="btn btn-sm btn-secondary">This Week</button> *@
+    @*                     <button type="button" class="btn btn-sm btn-secondary">Last Week</button> *@
+    @*                 </div> *@
+    @*             </div> *@
+    @* *@
+    @*             <div id="morris-donut-example" style="height: 263px;"> *@
+    @*                 <svg height="263" version="1.1" width="344" xmlns="http://www.w3.org/2000/svg" *@
+    @*                      xmlns:xlink="http://www.w3.org/1999/xlink" *@
+    @*                      style="overflow: hidden; position: relative; left: -0.640625px;"> *@
+    @*                     <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with HN 2.1.2</desc> *@
+    @*                     <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs> *@
+    @*                     <path fill="none" stroke="#3db9dc" *@
+    @*                           d="M172,212.5A81,81,0,0,0,248.6590235852246,157.66092702791667" stroke-width="2" *@
+    @*                           opacity="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 0;"></path> *@
+    @*                     <path fill="#3db9dc" stroke="#ffffff" *@
+    @*                           d="M172,215.5A84,84,0,0,0,251.49824668097364,158.62985025117285L282.2564968849218,169.12651850311474A116.5,116.5,0,0,1,172,248Z" *@
+    @*                           stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <path fill="none" stroke="#1bb99a" *@
+    @*                           d="M248.6590235852246,157.66092702791667A81,81,0,0,0,99.35663179554165,95.66787675965199" *@
+    @*                           stroke-width="2" opacity="1" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 1;"></path> *@
+    @*                     <path fill="#1bb99a" stroke="#ffffff" *@
+    @*                           d="M251.49824668097364,158.62985025117285A84,84,0,0,0,96.666136676858,94.34076108408354L63.03494769331246,77.75181513947797A121.5,121.5,0,0,1,286.98853537783685,170.74139054187503Z" *@
+    @*                           stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <path fill="none" stroke="#ebeff2" *@
+    @*                           d="M99.35663179554165,95.66787675965199A81,81,0,0,0,171.97455309992458,212.49999600281024" *@
+    @*                           stroke-width="2" opacity="0" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 0;"></path> *@
+    @*                     <path fill="#ebeff2" stroke="#ffffff" *@
+    @*                           d="M96.666136676858,94.34076108408354A84,84,0,0,0,171.973610622144,215.49999585476618L171.96340044618785,247.9999942509555A116.5,116.5,0,0,1,67.51910622445186,79.96367459875873Z" *@
+    @*                           stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path> *@
+    @*                     <text x="172" y="121.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="15px" *@
+    @*                           stroke="none" fill="#000000" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 15px; font-weight: 800;" *@
+    @*                           font-weight="800" transform="matrix(0.8957,0,0,0.8957,17.9413,13.8223)" *@
+    @*                           stroke-width="1.1164694787379972"> *@
+    @*                         <tspan dy="6" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Italian Language 02 *@
+    @*                         </tspan> *@
+    @*                     </text> *@
+    @*                     <text x="172" y="141.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="14px" *@
+    @*                           stroke="none" fill="#000000" *@
+    @*                           style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 14px;" *@
+    @*                           transform="matrix(1.6875,0,0,1.6875,-118.2393,-91.7813)" *@
+    @*                           stroke-width="0.5925925925925926"> *@
+    @*                         <tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">30</tspan> *@
+    @*                     </text> *@
+    @*                 </svg> *@
+    @*             </div> *@
+    @* *@
+    @*             <div class="text-xs-center"> *@
+    @*                 <ul class="list-inline chart-detail-list m-b-0"> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #3db9dc;"><i class="zmdi zmdi-circle-o m-r-5"></i>Đồ ăn</h6> *@
+    @*                     </li> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #1bb99a;"><i class="zmdi zmdi-triangle-up m-r-5"></i>Đồ uống</h6> *@
+    @*                     </li> *@
+    @*                     <li class="list-inline-item"> *@
+    @*                         <h6 style="color: #818a91;"><i class="zmdi zmdi-square-o m-r-5"></i>Chè</h6> *@
+    @*                     </li> *@
+    @*                 </ul> *@
+    @*             </div> *@
+    @* *@
+    @*         </div> *@
+    @*     </div><!-- end col--> *@
+    @* *@
+    @* *@
+    @* </div> *@
+    <!-- end row -->
+
+
+    <div class="row">
+        <div class="col-xs-12 col-lg-12">
+            <div class="card-box">
+
+                <h4 class="header-title m-t-0 m-b-30">Đơn đặt hàng mới <a href="@Url.Action("Index", "Order")"
+                                                                          class="btn btn-info btn-sm">Xem tất cả</a>
+                </h4>
+
+                <div class="table-responsive">
+                    <table class="table table-bordered m-b-0">
+                        <thead>
+                        <tr>
+                            <th>Mã đơn</th>
+                            <th>Tình trạng</th>
+                            <th>Thanh toán</th>
+                            <th>Giao hàng</th>
+                            <th>Khách hàng</th>
+                            <th>Phương thức</th>
+                            <th>Ngày đặt</th>
+                            <th></th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        @foreach (var order in orders)
+                        {
+                            <tr>
+                                <td>@order.OrderID</td>
+                                <td>
+                                    @{
+                                        var statusColor = "";
+                                        switch (order.OrderStatusID)
+                                        {
+                                            case 1:
+                                                statusColor = "warning";
+                                                break;
+                                            case 2:
+                                                statusColor = "info";
+                                                break;
+                                            case 3:
+                                                statusColor = "success";
+                                                break;
+                                            default:
+                                                statusColor = "danger";
+                                                break;
+                                        }
+
+                                        <span class="label label-@statusColor">@order.OrderStatu.OrderStatusName</span>
+                                    }
+                                </td>
+                                <td>
+                                    @if (order.Paid)
+                                    {
+                                        <span class="label label-success">Đã thanh toán</span>
+                                    }
+                                    else
+                                    {
+                                        <span class="label label-warning">Chưa thanh toán</span>
+                                    }
+                                </td>
+                                <td>
+                                    @{
+                                        statusColor = "";
+                                        switch (order.ShippingStatusID)
+                                        {
+                                            case 1:
+                                                statusColor = "danger";
+                                                break;
+                                            case 2:
+                                                statusColor = "info";
+                                                break;
+                                            case 3:
+                                                statusColor = "success";
+                                                break;
+                                        }
+                                    }
+                                    <span class="label label-@statusColor">@order.ShippingStatu.ShippingName</span>
+                                </td>
+                                <td>@order.Customer.FullName<br/>@order.Customer.Email</td>
+                                <td>@order.Payment.PaymentName</td>
+                                <td>@order.OrderDate.ToString("dd/MM/yyyy")</td>
+                                <td><a href="@Url.Action("Detail", "Order", new { id = order.OrderID })"
+                                       class="btn btn-info">Xem chi tiết</a></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+
+
+            </div>
+        </div><!-- end col-->
+
+
+    </div>
+
+
+</div>
+
+@section scripts {
+<script>
+    $(document).ready(function() {
+        // Format currency helper
+        function formatCurrency(value) {
+            if (value == null || value === undefined) return '0 đ';
+            return new Intl.NumberFormat('vi-VN').format(value) + ' đ';
+        }
+
+        // Get data from ViewBag
+        var revenueLabels = @Html.Raw(Json.Encode(ViewBag.RevenueLabels ?? new List<string>()));
+        var revenueData = @Html.Raw(Json.Encode(ViewBag.RevenueData ?? new List<long>()));
+        var orderCountData = @Html.Raw(Json.Encode(ViewBag.OrderCountData ?? new List<int>()));
+        var orderStatusLabels = @Html.Raw(Json.Encode(ViewBag.OrderStatusLabels ?? new List<string>()));
+        var orderStatusData = @Html.Raw(Json.Encode(ViewBag.OrderStatusData ?? new List<int>()));
+        var topProductLabels = @Html.Raw(Json.Encode(ViewBag.TopProductLabels ?? new List<string>()));
+        var topProductData = @Html.Raw(Json.Encode(ViewBag.TopProductData ?? new List<int>()));
+        var monthlyRevenueLabels = @Html.Raw(Json.Encode(ViewBag.MonthlyRevenueLabels ?? new List<string>()));
+        var monthlyRevenueData = @Html.Raw(Json.Encode(ViewBag.MonthlyRevenueData ?? new List<long>()));
+
+        // Ensure arrays are not null
+        if (!revenueLabels || revenueLabels.length === 0) revenueLabels = ['Chưa có dữ liệu'];
+        if (!revenueData || revenueData.length === 0) revenueData = [0];
+        if (!orderCountData || orderCountData.length === 0) orderCountData = [0];
+        if (!orderStatusLabels || orderStatusLabels.length === 0) orderStatusLabels = ['Chưa có dữ liệu'];
+        if (!orderStatusData || orderStatusData.length === 0) orderStatusData = [0];
+        if (!topProductLabels || topProductLabels.length === 0) topProductLabels = ['Chưa có dữ liệu'];
+        if (!topProductData || topProductData.length === 0) topProductData = [0];
+        if (!monthlyRevenueLabels || monthlyRevenueLabels.length === 0) monthlyRevenueLabels = ['Chưa có dữ liệu'];
+        if (!monthlyRevenueData || monthlyRevenueData.length === 0) monthlyRevenueData = [0];
+
+        // Revenue Chart (Line Chart)
+        var revenueCtx = document.getElementById('revenueChart').getContext('2d');
+        var revenueChart = new Chart(revenueCtx, {
+            type: 'line',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: revenueData,
+                    borderColor: 'rgb(75, 192, 192)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Doanh thu: ' + formatCurrency(context.parsed.y);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        // Order Count Chart (Bar Chart)
+        var orderCountCtx = document.getElementById('orderCountChart').getContext('2d');
+        var orderCountChart = new Chart(orderCountCtx, {
+            type: 'bar',
+            data: {
+                labels: revenueLabels,
+                datasets: [{
+                    label: 'Số đơn hàng',
+                    data: orderCountData,
+                    backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Order Status Chart (Pie Chart)
+        var orderStatusCtx = document.getElementById('orderStatusChart').getContext('2d');
+        var orderStatusChart = new Chart(orderStatusCtx, {
+            type: 'doughnut',
+            data: {
+                labels: orderStatusLabels,
+                datasets: [{
+                    data: orderStatusData,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.6)',
+                        'rgba(54, 162, 235, 0.6)',
+                        'rgba(255, 206, 86, 0.6)',
+                        'rgba(75, 192, 192, 0.6)',
+                        'rgba(153, 102, 255, 0.6)',
+                        'rgba(255, 159, 64, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)',
+                        'rgba(255, 159, 64, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 1,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'right'
+                    }
+                }
+            }
+        });
+
+        // Top Products Chart (Bar Chart - Horizontal)
+        var topProductsCtx = document.getElementById('topProductsChart').getContext('2d');
+        var topProductsChart = new Chart(topProductsCtx, {
+            type: 'bar',
+            data: {
+                labels: topProductLabels,
+                datasets: [{
+                    label: 'Số lượng bán',
+                    data: topProductData,
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 2,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    }
+                },
+                scales: {
+                    x: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1
+                        }
+                    }
+                }
+            }
+        });
+
+        // Monthly Revenue Chart (Line Chart)
+        var monthlyRevenueCtx = document.getElementById('monthlyRevenueChart').getContext('2d');
+        var monthlyRevenueChart = new Chart(monthlyRevenueCtx, {
+            type: 'line',
+            data: {
+                labels: monthlyRevenueLabels,
+                datasets: [{
+                    label: 'Doanh thu (VNĐ)',
+                    data: monthlyRevenueData,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                aspectRatio: 3,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top'
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return 'Doanh thu: ' + formatCurrency(context.parsed.y);
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return formatCurrency(value);
+                            }
+                        }
+                    }
+                }
+            }
+        });
+    });
+</script>
+}

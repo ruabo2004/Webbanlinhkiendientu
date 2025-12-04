@@ -1,0 +1,827 @@
+@* Admin Chat Widget - Giống nút AI chat *@
+<div id="admin-chatbox-container" class="admin-chatbox-container">
+    <!-- Toggle Button -->
+    <button id="admin-chat-toggle" class="admin-chat-toggle" title="Chat với Admin - Nhấn để chat">
+        <i class="fa fa-headphones"></i>
+        <span class="admin-badge">Admin</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="admin-chat-window" class="admin-chat-window" style="display: none;">
+        <!-- Header -->
+        <div class="admin-chat-header">
+            <div class="admin-chat-title">
+                <i class="fa fa-user-circle"></i>
+                <span>Chat với Admin</span>
+            </div>
+            <button id="admin-chat-close" class="admin-chat-close" title="Đóng">
+                <i class="fa fa-times"></i>
+            </button>
+        </div>
+
+        <!-- Messages Container -->
+        <div class="admin-chat-messages" id="admin-chat-messages">
+            <div class="admin-message admin-message-system">
+                <div class="admin-avatar">
+                    <i class="fa fa-info-circle"></i>
+                </div>
+                <div class="admin-message-content">
+                    <strong>Xin chào!</strong> Bạn cần hỗ trợ gì? 😊<br>
+                    Chúng tôi sẽ phản hồi trong thời gian sớm nhất!
+                </div>
+            </div>
+        </div>
+
+        <!-- Input Container -->
+        <div class="admin-chat-input-container">
+            <input type="text" 
+                   id="admin-chat-input" 
+                   placeholder="Nhập tin nhắn của bạn..." 
+                   class="admin-chat-input"
+                   autocomplete="off" />
+            <button type="button" id="admin-chat-send" class="admin-chat-send-btn" title="Gửi">
+                <i class="fa fa-paper-plane"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+/* === CHATBOX CONTAINER === */
+.admin-chatbox-container {
+    position: fixed;
+    bottom: 20px;
+    right: 90px; /* Đặt bên trái nút AI chat */
+    z-index: 9998;
+    font-family: 'Lato', sans-serif;
+}
+
+/* === TOGGLE BUTTON === */
+.admin-chat-toggle {
+    position: relative;
+    background: linear-gradient(135deg, #D70018 0%, #b80015 100%);
+    color: white;
+    border: none;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(215, 0, 24, 0.4);
+    font-size: 24px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.admin-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 25px rgba(215, 0, 24, 0.6);
+}
+
+.admin-chat-toggle .admin-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: #ff4757;
+    color: white;
+    font-size: 10px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(255, 71, 87, 0.4);
+}
+
+/* === CHAT WINDOW === */
+.admin-chat-window {
+    position: absolute;
+    bottom: 75px;
+    right: 0;
+    width: 380px;
+    max-width: calc(100vw - 40px);
+    height: 550px;
+    max-height: calc(100vh - 120px);
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: slideUp 0.3s ease;
+}
+
+@@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* === HEADER === */
+.admin-chat-header {
+    background: linear-gradient(135deg, #D70018 0%, #b80015 100%);
+    color: white;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 20px 20px 0 0;
+}
+
+.admin-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.admin-chat-close {
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 5px;
+    transition: all 0.3s ease;
+}
+
+.admin-chat-close:hover {
+    transform: rotate(90deg);
+    opacity: 0.8;
+}
+
+/* === MESSAGES === */
+.admin-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    background: #f8f9fa;
+}
+
+.admin-message {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+    animation: fadeIn 0.3s ease;
+}
+
+@@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.admin-message.user {
+    flex-direction: row-reverse;
+}
+
+.admin-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 18px;
+    color: white;
+}
+
+.admin-message.user .admin-avatar {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.admin-message.admin .admin-avatar {
+    background: linear-gradient(135deg, #D70018 0%, #b80015 100%);
+}
+
+.admin-message-system .admin-avatar {
+    background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+}
+
+.admin-message-content {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 18px;
+    word-wrap: break-word;
+    line-height: 1.4;
+    font-size: 14px;
+}
+
+.admin-message.user .admin-message-content {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom-right-radius: 4px;
+}
+
+.admin-message.admin .admin-message-content {
+    background: white;
+    color: #333;
+    border: 1px solid #e0e0e0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.admin-message-system .admin-message-content {
+    background: #e8f4f8;
+    color: #2c3e50;
+    border-left: 3px solid #3498db;
+}
+
+.admin-message-time {
+    font-size: 11px;
+    color: #999;
+    margin-top: 5px;
+    text-align: right;
+}
+
+.admin-message.user .admin-message-time {
+    text-align: left;
+}
+
+/* === INPUT === */
+.admin-chat-input-container {
+    display: flex;
+    gap: 10px;
+    padding: 15px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+}
+
+.admin-chat-input {
+    flex: 1;
+    border: 1px solid #e0e0e0;
+    border-radius: 25px;
+    padding: 12px 20px;
+    font-size: 14px;
+    outline: none;
+    transition: all 0.3s ease;
+}
+
+.admin-chat-input:focus {
+    border-color: #D70018;
+    box-shadow: 0 0 0 3px rgba(215, 0, 24, 0.1);
+}
+
+.admin-chat-send-btn {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #D70018 0%, #b80015 100%);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    font-size: 18px;
+}
+
+.admin-chat-send-btn:hover:not(:disabled) {
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(215, 0, 24, 0.4);
+}
+
+.admin-chat-send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Scrollbar */
+.admin-chat-messages::-webkit-scrollbar {
+    width: 6px;
+}
+
+.admin-chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.admin-chat-messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 3px;
+}
+
+.admin-chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Responsive */
+@@media (max-width: 768px) {
+    .admin-chatbox-container {
+        right: 20px;
+        bottom: 90px; /* Đặt trên nút AI chat trên mobile */
+    }
+    
+    .admin-chat-window {
+        width: calc(100vw - 40px);
+        height: calc(100vh - 150px);
+    }
+}
+</style>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/signalr.js/2.4.3/jquery.signalR.min.js"></script>
+<script src="~/signalr/hubs"></script>
+<script>
+// Đợi jQuery và SignalR load xong
+(function() {
+    function initAdminChat() {
+        // Kiểm tra jQuery
+        if (typeof jQuery === 'undefined' || typeof $ === 'undefined') {
+            console.error('jQuery chưa được load');
+            setTimeout(initAdminChat, 100);
+            return;
+        }
+        
+        // Kiểm tra SignalR
+        if (typeof $.connection === 'undefined') {
+            console.error('SignalR chưa được load');
+            setTimeout(initAdminChat, 100);
+            return;
+        }
+        
+        // Đợi hubs được generate
+        if (typeof $.connection.chatHub === 'undefined') {
+            setTimeout(initAdminChat, 100);
+            return;
+        }
+        
+        // Bắt đầu khởi tạo chat
+        $(document).ready(function() {
+            var isOpen = false;
+            window.adminChatIsOpen = false; // Expose để chat AI có thể truy cập
+            var chatHub = $.connection.chatHub;
+            var currentCustomerId = @{
+                var customer = WebBanLinhKienDienTu.Core.UserManager.CurrentCustomer;
+                @(customer != null ? customer.CustomerID : 0)
+            };
+            var lastCustomerId = currentCustomerId; // Lưu customerId cuối cùng
+
+            console.log('Admin chat widget initialized, CustomerID:', currentCustomerId);
+            console.log('chatHub:', chatHub);
+            console.log('$.connection:', $.connection);
+            
+            // Function để reload chat với customerId mới
+            function reloadChatWithNewCustomer() {
+                // Lấy customerId mới từ server qua AJAX
+                $.ajax({
+                    url: '@Url.Action("GetCurrentCustomerId", "Home")',
+                    type: 'POST',
+                    success: function(response) {
+                        var newCustomerId = response && response.customerId ? response.customerId : 0;
+                        if (newCustomerId !== lastCustomerId) {
+                            console.log('CustomerId changed from', lastCustomerId, 'to', newCustomerId);
+                            lastCustomerId = newCustomerId;
+                            currentCustomerId = newCustomerId;
+                            
+                            // Nếu có customerId mới, reconnect SignalR và reload history
+                            if (newCustomerId > 0) {
+                                // Xóa tin nhắn cũ nếu đang mở chat
+                                if (isOpen) {
+                                    $('#admin-chat-messages').empty();
+                                }
+                                
+                                // Reconnect với customerId mới
+                                if ($.connection.hub && $.connection.hub.state === 1) {
+                                    $.connection.hub.stop().done(function() {
+                                        $.connection.hub.qs = { customerId: newCustomerId };
+                                        $.connection.hub.start({ qs: { customerId: newCustomerId } }).done(function() {
+                                            if (chatHub.server.registerCustomer) {
+                                                chatHub.server.registerCustomer(newCustomerId);
+                                            }
+                                            // Nếu đang mở chat, load lịch sử ngay
+                                            if (isOpen && chatHub.server.getChatHistory) {
+                                                console.log('Loading chat history after reconnect for CustomerID:', newCustomerId);
+                                                chatHub.server.getChatHistory().done(function() {
+                                                    console.log('Chat history loaded after reconnect');
+                                                }).fail(function(error) {
+                                                    console.error('Failed to load chat history after reconnect:', error);
+                                                });
+                                            }
+                                        });
+                                    });
+                                } else {
+                                    $.connection.hub.qs = { customerId: newCustomerId };
+                                    $.connection.hub.start({ qs: { customerId: newCustomerId } }).done(function() {
+                                        if (chatHub.server.registerCustomer) {
+                                            chatHub.server.registerCustomer(newCustomerId);
+                                        }
+                                        // Nếu đang mở chat, load lịch sử ngay
+                                        if (isOpen && chatHub.server.getChatHistory) {
+                                            console.log('Loading chat history after start for CustomerID:', newCustomerId);
+                                            chatHub.server.getChatHistory().done(function() {
+                                                console.log('Chat history loaded after start');
+                                            }).fail(function(error) {
+                                                console.error('Failed to load chat history after start:', error);
+                                            });
+                                        }
+                                    });
+                                }
+                            } else if (newCustomerId === 0) {
+                                // Nếu đã logout
+                                if (isOpen) {
+                                    $('#admin-chat-messages').empty();
+                                    addSystemMessage('Vui lòng đăng nhập để sử dụng chat');
+                                }
+                                // Dừng SignalR connection
+                                if ($.connection.hub && $.connection.hub.state === 1) {
+                                    $.connection.hub.stop();
+                                }
+                            }
+                        }
+                    },
+                    error: function() {
+                        // Nếu không lấy được, giữ nguyên giá trị hiện tại
+                    }
+                });
+            }
+
+    // Function để load chat history
+    function loadChatHistory() {
+        if (currentCustomerId <= 0) {
+            console.warn('Cannot load chat history: CustomerID = 0');
+            return;
+        }
+        
+        if (!chatHub || !chatHub.server) {
+            console.warn('chatHub.server not available');
+            return;
+        }
+        
+        if (!chatHub.server.getChatHistory) {
+            console.warn('getChatHistory method not available');
+            return;
+        }
+        
+        // Kiểm tra SignalR connection
+        if ($.connection.hub && $.connection.hub.state === 1) {
+            // Connection đã sẵn sàng, gọi ngay
+            console.log('Loading chat history for CustomerID:', currentCustomerId);
+            chatHub.server.getChatHistory().done(function() {
+                console.log('Chat history loaded successfully');
+            }).fail(function(error) {
+                console.error('Failed to load chat history:', error);
+            });
+        } else {
+            // Chưa connect, đợi connection start
+            console.log('SignalR not connected, waiting for connection...');
+            if ($.connection.hub) {
+                $.connection.hub.start({ qs: { customerId: currentCustomerId } }).done(function() {
+                    console.log('SignalR connected, loading chat history...');
+                    if (chatHub.server.registerCustomer) {
+                        chatHub.server.registerCustomer(currentCustomerId);
+                    }
+                    chatHub.server.getChatHistory().done(function() {
+                        console.log('Chat history loaded successfully');
+                    }).fail(function(error) {
+                        console.error('Failed to load chat history:', error);
+                    });
+                });
+            }
+        }
+    }
+    
+    // === TOGGLE CHAT WINDOW ===
+    $('#admin-chat-toggle').on('click', function() {
+        isOpen = !isOpen;
+        window.adminChatIsOpen = isOpen; // Đồng bộ với window object
+        $('#admin-chat-window').toggle();
+        
+        // Đóng chat AI nếu đang mở
+        if (isOpen && $('#ai-chat-window').is(':visible')) {
+            $('#ai-chat-window').hide();
+            // Cập nhật biến isOpen của AI chat
+            if (typeof window.aiChatIsOpen !== 'undefined') {
+                window.aiChatIsOpen = false;
+            }
+        }
+        
+        if (isOpen) {
+            // Luôn reload customerId mới nhất khi mở chat
+            $.ajax({
+                url: '@Url.Action("GetCurrentCustomerId", "Home")',
+                type: 'POST',
+                success: function(response) {
+                    var newCustomerId = response && response.customerId ? response.customerId : 0;
+                    if (newCustomerId !== currentCustomerId) {
+                        console.log('CustomerId changed when opening chat from', currentCustomerId, 'to', newCustomerId);
+                        currentCustomerId = newCustomerId;
+                        lastCustomerId = newCustomerId;
+                        
+                        // Reconnect với customerId mới nếu cần
+                        if ($.connection.hub && $.connection.hub.state === 1) {
+                            $.connection.hub.stop().done(function() {
+                                $.connection.hub.qs = { customerId: newCustomerId };
+                                $.connection.hub.start({ qs: { customerId: newCustomerId } }).done(function() {
+                                    if (chatHub.server.registerCustomer) {
+                                        chatHub.server.registerCustomer(newCustomerId);
+                                    }
+                                    loadChatHistory();
+                                });
+                            });
+                        } else {
+                            loadChatHistory();
+                        }
+                    } else {
+                        // CustomerId không đổi, chỉ load history
+                        loadChatHistory();
+                    }
+                },
+                error: function() {
+                    // Nếu không lấy được, vẫn thử load với customerId hiện tại
+                    loadChatHistory();
+                }
+            });
+            
+            $('#admin-chat-input').focus();
+        }
+    });
+    
+    // Kiểm tra thay đổi customerId mỗi 3 giây (luôn kiểm tra, không chỉ khi mở chat)
+    setInterval(function() {
+        reloadChatWithNewCustomer();
+    }, 3000);
+
+    $('#admin-chat-close').on('click', function() {
+        isOpen = false;
+        window.adminChatIsOpen = false; // Đồng bộ với window object
+        $('#admin-chat-window').hide();
+    });
+
+    // === SIGNALR CLIENT METHODS ===
+    chatHub.client.receiveAdminMessage = function(message, messageId, createdDate) {
+        addMessage(message, false, createdDate);
+    };
+
+    chatHub.client.messageSent = function(messageId, message, createdDate) {
+        // Tin nhắn đã được gửi thành công
+    };
+
+    chatHub.client.chatHistory = function(messages) {
+        console.log('chatHistory client method called with messages:', messages);
+        console.log('Messages count:', messages ? messages.length : 0);
+        
+        $('#admin-chat-messages').empty();
+        if (messages && messages.length > 0) {
+            console.log('Rendering', messages.length, 'messages');
+            messages.forEach(function(msg) {
+                console.log('Adding message:', msg.Message, 'IsFromAdmin:', msg.IsFromAdmin);
+                // Đảo ngược logic: IsFromAdmin = true nghĩa là từ admin, nhưng addMessage cần isUser
+                // isUser = true nghĩa là từ user, false nghĩa là từ admin
+                // Vậy: isUser = !IsFromAdmin
+                addMessage(msg.Message, !msg.IsFromAdmin, msg.CreatedDate);
+            });
+        } else {
+            console.log('No messages found, showing system message');
+            addSystemMessage('Chưa có tin nhắn nào. Hãy bắt đầu cuộc trò chuyện!');
+        }
+        scrollToBottom();
+    };
+
+    // === SEND MESSAGE ===
+    function sendMessage() {
+        console.log('sendMessage() called');
+        console.log('currentCustomerId:', currentCustomerId);
+        
+        if (currentCustomerId <= 0) {
+            alert('Vui lòng đăng nhập để chat với admin!');
+            return;
+        }
+
+        var message = $('#admin-chat-input').val().trim();
+        console.log('Message input value:', message);
+        if (!message) {
+            console.log('Message is empty, returning');
+            return;
+        }
+
+        // Kiểm tra SignalR connection - đơn giản hóa
+        if (!chatHub) {
+            console.error('chatHub không tồn tại!');
+            alert('Lỗi: Chat hub chưa được khởi tạo. Vui lòng refresh trang.');
+            return;
+        }
+        
+        if (!$.connection.hub) {
+            console.error('$.connection.hub không tồn tại!');
+            alert('Lỗi: SignalR chưa được load. Vui lòng refresh trang.');
+            return;
+        }
+        
+        // Kiểm tra state: 1 = connected, 0 = disconnected, 2 = connecting, 4 = reconnecting
+        var hubState = $.connection.hub.state;
+        if (hubState !== 1) { // 1 = connected
+            console.warn('SignalR chưa kết nối. State:', hubState, '. Đang thử kết nối...');
+            $.connection.hub.start().done(function() {
+                console.log('SignalR đã kết nối, gửi lại tin nhắn...');
+                sendMessageInternal(message);
+            }).fail(function(error) {
+                console.error('Không thể kết nối SignalR:', error);
+                alert('Lỗi kết nối. Vui lòng refresh trang và thử lại.');
+            });
+            return;
+        }
+
+        sendMessageInternal(message);
+    }
+
+    function sendMessageInternal(message) {
+        try {
+            console.log('sendMessageInternal called with message:', message);
+            console.log('chatHub:', chatHub);
+            console.log('chatHub.server:', chatHub.server);
+            console.log('chatHub.server.sendMessage:', chatHub.server.sendMessage);
+            
+            addMessage(message, true);
+            $('#admin-chat-input').val('');
+            
+            console.log('Đang gọi chatHub.server.sendMessage...');
+            console.log('Connection state:', $.connection.hub.state);
+            console.log('Connection ID:', $.connection.hub.id);
+            console.log('Sending with customerId:', currentCustomerId);
+            
+            try {
+                // Truyền customerId trực tiếp trong method call
+                var promise = chatHub.server.sendMessage(message, currentCustomerId);
+                console.log('Promise received:', promise);
+                
+                if (promise) {
+                    promise.done(function(result) {
+                        console.log('Tin nhắn đã được gửi thành công, result:', result);
+                    }).fail(function(error) {
+                        console.error('Lỗi khi gửi tin nhắn:', error);
+                        console.error('Error details:', JSON.stringify(error));
+                        alert('Lỗi khi gửi tin nhắn: ' + (error.message || error || 'Unknown error'));
+                    }).always(function() {
+                        console.log('sendMessage promise completed (done or fail)');
+                    });
+                } else {
+                    console.error('chatHub.server.sendMessage không trả về promise!');
+                    alert('Lỗi: Không thể gửi tin nhắn. Vui lòng kiểm tra console.');
+                }
+            } catch (ex) {
+                console.error('Exception khi gọi sendMessage:', ex);
+                console.error('Exception stack:', ex.stack);
+                alert('Lỗi: ' + ex.message);
+            }
+        } catch (ex) {
+            console.error('Exception khi gửi tin nhắn:', ex);
+            console.error('Stack trace:', ex.stack);
+            alert('Lỗi: ' + ex.message);
+        }
+    }
+
+    $('#admin-chat-send').on('click', function(e) {
+        e.preventDefault();
+        console.log('Send button clicked');
+        sendMessage();
+    });
+    
+    $('#admin-chat-input').on('keypress', function(e) {
+        if (e.which === 13) {
+            e.preventDefault();
+            console.log('Enter key pressed');
+            sendMessage();
+        }
+    });
+
+    // === ADD MESSAGE ===
+    function addMessage(text, isUser, createdDate) {
+        var messageClass = isUser ? 'user' : 'admin';
+        var timeStr = createdDate ? formatTime(createdDate) : '';
+        
+        var messageHtml = '<div class="admin-message ' + messageClass + '">' +
+            '<div class="admin-avatar">' +
+            '<i class="fa ' + (isUser ? 'fa-user' : 'fa-headphones') + '"></i>' +
+            '</div>' +
+            '<div class="admin-message-content">' +
+            text.replace(/\n/g, '<br>') +
+            (timeStr ? '<div class="admin-message-time">' + timeStr + '</div>' : '') +
+            '</div>' +
+            '</div>';
+        
+        $('#admin-chat-messages').append(messageHtml);
+        scrollToBottom();
+    }
+
+    function addSystemMessage(text) {
+        var messageHtml = '<div class="admin-message admin-message-system">' +
+            '<div class="admin-avatar"><i class="fa fa-info-circle"></i></div>' +
+            '<div class="admin-message-content">' + text + '</div>' +
+            '</div>';
+        $('#admin-chat-messages').append(messageHtml);
+        scrollToBottom();
+    }
+
+    function formatTime(dateStr) {
+        var date = new Date(dateStr);
+        var now = new Date();
+        var diff = now - date;
+        
+        if (diff < 60000) return 'Vừa xong';
+        if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
+        if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+        
+        return date.toLocaleDateString('vi-VN') + ' ' + 
+               date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+    }
+
+    function scrollToBottom() {
+        var messages = $('#admin-chat-messages');
+        messages.scrollTop(messages[0].scrollHeight);
+    }
+
+            // === START SIGNALR CONNECTION ===
+            console.log('Bắt đầu khởi tạo SignalR connection...');
+            console.log('CustomerID:', currentCustomerId);
+            console.log('chatHub:', chatHub);
+            console.log('$.connection:', $.connection);
+            
+            // Kiểm tra customerId mới nhất ngay khi load trang, sau đó start SignalR
+            $.ajax({
+                url: '@Url.Action("GetCurrentCustomerId", "Home")',
+                type: 'POST',
+                success: function(response) {
+                    var newCustomerId = response && response.customerId ? response.customerId : 0;
+                    if (newCustomerId !== currentCustomerId) {
+                        console.log('CustomerId updated on page load from', currentCustomerId, 'to', newCustomerId);
+                        currentCustomerId = newCustomerId;
+                        lastCustomerId = newCustomerId;
+                    }
+                    
+                    // Start SignalR với customerId mới nhất
+                    if (currentCustomerId > 0) {
+                        console.log('Bắt đầu kết nối SignalR, CustomerID:', currentCustomerId);
+                        
+                        // QUAN TRỌNG: Query string phải được set TRƯỚC khi start connection
+                        // Truyền customerId qua query string để Hub có thể lấy được
+                        $.connection.hub.qs = { customerId: currentCustomerId };
+                        console.log('Query string set BEFORE start:', $.connection.hub.qs);
+                        
+                        $.connection.hub.start({ qs: { customerId: currentCustomerId } }).done(function() {
+                            console.log('Query string after start:', $.connection.hub.qs);
+                            console.log('Admin chat connected successfully');
+                            console.log('Connection state:', $.connection.hub.state);
+                            console.log('Connection ID:', $.connection.hub.id);
+                            
+                            // Gọi method để đăng ký customer với connection (nếu method tồn tại)
+                            if (chatHub.server.registerCustomer) {
+                                chatHub.server.registerCustomer(currentCustomerId);
+                            } else {
+                                console.warn('registerCustomer method not available, customer will be retrieved from query string');
+                            }
+                            
+                            // Nếu chat window đang mở, tự động load lịch sử
+                            if (isOpen) {
+                                console.log('Chat window is open, loading chat history...');
+                                if (chatHub.server.getChatHistory) {
+                                    chatHub.server.getChatHistory().done(function() {
+                                        console.log('Chat history loaded on connection');
+                                    }).fail(function(error) {
+                                        console.error('Failed to load chat history on connection:', error);
+                                    });
+                                }
+                            }
+                        }).fail(function(error) {
+                            console.error('Failed to connect to admin chat:', error);
+                            console.error('Error details:', JSON.stringify(error));
+                            alert('Không thể kết nối chat. Vui lòng refresh trang.');
+                        });
+                    } else {
+                        console.warn('CustomerID = 0, không kết nối SignalR');
+                    }
+                },
+                error: function() {
+                    // Nếu không lấy được, dùng customerId hiện tại
+                    if (currentCustomerId > 0) {
+                        $.connection.hub.qs = { customerId: currentCustomerId };
+                        $.connection.hub.start({ qs: { customerId: currentCustomerId } }).done(function() {
+                            if (chatHub.server.registerCustomer) {
+                                chatHub.server.registerCustomer(currentCustomerId);
+                            }
+                        });
+                    }
+                }
+            });
+        });
+    }
+    
+    // Bắt đầu khởi tạo khi DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initAdminChat);
+    } else {
+        initAdminChat();
+    }
+})();
+</script>
+

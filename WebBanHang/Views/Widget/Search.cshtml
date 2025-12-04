@@ -1,0 +1,17 @@
+﻿@model IEnumerable<GroupProduct>
+@{
+    Layout = null;
+}
+
+<div class="search-area" style="display: flex; background: white; border-radius: 25px; overflow: hidden; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+    @using (Html.BeginForm("Search", "Product", FormMethod.Get, new { style = "display: flex; width: 100%;" }))
+    {
+        <input type="hidden" name="group" value="@(Request["group"] != null ? Request["group"] : "")" id="group">
+        <input type="text" class="form-control" value="@(Request["q"] != null ? Request["q"] : "")" name="q" placeholder="Từ khóa tìm kiếm..." style="border: none; padding: 10px 15px; font-size: 14px; flex: 1; border-radius: 25px 0 0 25px;">
+        <span class="input-group-btn">
+            <button class="btn btn-default" type="submit" style="border: none; background: transparent; padding: 10px 15px; color: #666; border-radius: 0 25px 25px 0;">
+                <i class="fa fa-search"></i>
+            </button>
+        </span>
+    }
+</div><!-- /.search-area -->

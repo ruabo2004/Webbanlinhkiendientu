@@ -1,0 +1,67 @@
+﻿
+@{
+    ViewBag.Title = "ShowGroupItem";
+    GroupProduct group = Model.Group;
+}
+<section class="section featured-product wow fadeInUp">
+    <h3 class="section-title">@Html.ActionLink(@group.GroupName, "Detail", "Category", new { id = group.GroupID }, null)</h3>
+    <div class="owl-carousel home-owl-carousel custom-carousel owl-theme outer-top-xs">
+        @foreach (Product product in ((IEnumerable<Product>)Model.Products).Take(10))
+         {
+        <div class="item item-carousel">
+            <div class="products">
+                <div class="product">
+                        <div class="product-image">
+                            <div class="image">
+                                <a href="@Url.Action("Detail", "Product", new { id = @product.ProductID })">
+                                    @{
+                                        var imgUrl = ImageHelper.DefaultImage();
+                                        if (product.ImageProducts.Count > 0) {
+                                            imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                        }
+                                        imgUrl += "?w=190&h=250";
+                                    }
+                                    <img src="@Url.Content("~/Content/images/blank.gif")" data-echo="@imgUrl" alt="">
+                                </a>
+                            </div><!-- /.image -->
+                            @if (product.SalePrice != 0 && (product.Price - product.SalePrice) > 0)
+                            {
+                                <div class="tag sale"><span>-@(((product.Price - product.SalePrice) * 100) / product.Price)%</span></div>
+                            }
+                        </div><!-- /.product-image -->
+
+
+                        <div class="product-info text-left">
+                            <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID},null)">@product.ProductName</a></h3>
+                            <div class="rating rateit-small"></div>
+                            <div class="description"></div>
+                            <div class="product-price">
+                                <span class="price">
+                                    @if (product.isSale())
+                                    {
+                                        @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                    }
+                                    else
+                                    {
+                                        @Html.FormatCurrency(product.Price) <span>đ</span>
+                                    }
+                                </span>
+                                @if (product.isSale())
+                                {
+                                    <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                }
+
+                            </div><!-- /.product-price -->
+
+                        </div><!-- /.product-info -->
+                        <div class="cart clearfix animate-effect">
+                            <a href="#" class="btn btn-labeled btn-info add-cart" data-id="@product.ProductID">
+                                <span class="btn-label"><i class="fa fa-shopping-cart"></i></span>Thêm giỏ hàng
+                            </a>
+                        </div><!-- /.cart -->
+                    </div><!-- /.product -->
+            </div><!-- /.products -->
+        </div><!-- /.item -->
+         }
+    </div><!-- /.home-owl-carousel -->
+</section><!-- /.section -->

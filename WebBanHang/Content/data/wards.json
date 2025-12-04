@@ -1,0 +1,13 @@
+[
+  { "ward_id": 1001, "ward_name": "Ph??ng Phúc Xá", "ward_type": "Ph??ng", "district_id": 101 },
+  { "ward_id": 1002, "ward_name": "Ph??ng Trúc B?ch", "ward_type": "Ph??ng", "district_id": 101 },
+  { "ward_id": 1003, "ward_name": "Ph??ng V?nh Phúc", "ward_type": "Ph??ng", "district_id": 101 },
+
+  { "ward_id": 2001, "ward_name": "Ph??ng B?n Nghé", "ward_type": "Ph??ng", "district_id": 201 },
+  { "ward_id": 2002, "ward_name": "Ph??ng B?n Thành", "ward_type": "Ph??ng", "district_id": 201 },
+  { "ward_id": 2003, "ward_name": "Ph??ng Nguy?n Thái Bình", "ward_type": "Ph??ng", "district_id": 201 },
+
+  { "ward_id": 3001, "ward_name": "Ph??ng Th?ch Thang", "ward_type": "Ph??ng", "district_id": 301 },
+  { "ward_id": 3002, "ward_name": "Ph??ng H?i Châu I", "ward_type": "Ph??ng", "district_id": 301 },
+  { "ward_id": 3003, "ward_name": "Ph??ng H?i Châu II", "ward_type": "Ph??ng", "district_id": 301 }
+]

@@ -1,0 +1,15 @@
+<svg width="800" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0A8DFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#02C736;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="800" height="400" fill="url(#grad3)"/>
+  <text x="400" y="120" font-family="Arial, sans-serif" font-size="56" font-weight="bold" fill="white" text-anchor="middle">LAPTOP GAMING</text>
+  <text x="400" y="200" font-family="Arial, sans-serif" font-size="72" font-weight="bold" fill="#FFD700" text-anchor="middle">TRẢ GÓP 0%</text>
+  <text x="400" y="260" font-family="Arial, sans-serif" font-size="28" fill="white" text-anchor="middle">Cấu hình khủng - Lãi suất 0%</text>
+  <rect x="300" y="290" width="200" height="50" rx="25" fill="white"/>
+  <text x="400" y="323" font-family="Arial, sans-serif" font-size="22" font-weight="bold" fill="#0A8DFF" text-anchor="middle">KHÁM PHÁ</text>
+</svg>
+

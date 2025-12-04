@@ -1,0 +1,303 @@
+﻿
+@model GroupProduct
+@using WebBanLinhKienDienTu.Utils
+@{
+    ViewBag.Title = Model.GroupName;
+}
+
+<div class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-inner">
+            <ul class="list-inline list-unstyled">
+                <li>@Html.ActionLink("Trang chủ","Index","Home")</li>
+                @Html.ShowBreadcrumb(Model)
+            </ul>
+        </div>
+        <!-- /.breadcrumb-inner -->
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.breadcrumb -->
+<style>
+    body,
+    .body-content.category-detail-page,
+    .body-content.category-detail-page .container,
+    .body-content.category-detail-page .breadcrumb,
+    .body-content.category-detail-page .breadcrumb-inner,
+    .body-content.category-detail-page .row,
+    .body-content.category-detail-page .sidebar,
+    .body-content.category-detail-page .sidebar-module-container,
+    .body-content.category-detail-page .sidebar-filter,
+    .body-content.category-detail-page .sidebar-widget,
+    .body-content.category-detail-page .sidebar-widget .widget-header,
+    .body-content.category-detail-page .sidebar-widget-body,
+    .body-content.category-detail-page .price-range-holder,
+    .body-content.category-detail-page .search-result-container,
+    .body-content.category-detail-page .filters-container,
+    .body-content.category-detail-page .category-product,
+    .body-content.category-detail-page .category-product-inner,
+    .body-content.category-detail-page .products,
+    .body-content.category-detail-page .product,
+    .body-content.category-detail-page .product-list,
+    .body-content.category-detail-page .load-more-container {
+        background-color: #fff !important;
+    }
+    .body-content.category-detail-page {
+        padding-top: 20px;
+        padding-bottom: 60px;
+    }
+    .category-detail-page .sidebar-module-container,
+    .category-detail-page .sidebar-widget,
+    .category-detail-page .search-result-container,
+    .category-detail-page .filters-container,
+    .category-detail-page .category-product-inner,
+    .category-detail-page .products,
+    .category-detail-page .product-list {
+        box-shadow: none;
+        border: none;
+    }
+    .category-detail-page .widget-title,
+    .category-detail-page .section-title {
+        color: #333;
+    }
+</style>
+<div class="body-content category-detail-page">
+    <div class='container'>
+        <div class='row outer-bottom-sm'>
+            <div class='col-md-3 sidebar'>
+                <div class="sidebar-module-container">
+                    <h3 class="section-title">@Model.GroupName</h3>
+                    <div class="sidebar-filter">
+                        <!-- ============================================== SIDEBAR CATEGORY ============================================== -->
+                        @Html.Action("ListGroupProduct", new { id = Model.GroupID})
+                        <!-- /.sidebar-widget -->
+                        <!-- ============================================== SIDEBAR CATEGORY : END ============================================== -->
+                        <!-- ============================================== PRICE SILDER============================================== -->
+                        <div class="sidebar-widget outer-bottom-xs wow fadeInUp">
+                            <div class="widget-header">
+                                <h4 class="widget-title">Lọc theo giá</h4>
+                            </div>
+                            <div class="sidebar-widget-body">
+                                <ul class="list">
+                                    <li><a href="?@Url.QueryString("range_price","0,5000000")">Dưới 5.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price","5000000,10000000")">5.000.000&nbsp;₫ - 10.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price", "10000000,20000000")">10.000.000&nbsp;₫ - 20.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price", "20000000,30000000")">20.000.000&nbsp;₫ - 30.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price", "30000000,50000000")">30.000.000&nbsp;₫ - 50.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price", "50000000,100000000")">50.000.000&nbsp;₫ - 100.000.000&nbsp;₫</a></li>
+                                    <li><a href="?@Url.QueryString("range_price", "100000000,999999999")">Trên 100.000.000&nbsp;₫</a></li>
+                                </ul>
+                                <div>Hoặc chọn giá khác</div>
+                                <div class="price-range-holder m-t-10">
+                                    <span class="min-max">
+                                        <span class="pull-left">0đ</span>
+                                        <span class="pull-right">100.000.000đ</span>
+                                    </span>
+                                    <input type="hidden" id="amount" style="border:0; color:#000000; font-weight:bold;text-align:center;">
+                                    @{
+                                        string sliderValue = "";
+                                        if (Request["range_price"] != null && !String.IsNullOrEmpty(Request["range_price"]))
+                                        {
+                                            var priceParts = Request["range_price"].Split(',');
+                                            if (priceParts.Length == 2)
+                                            {
+                                                sliderValue = "[" + priceParts[0] + "," + priceParts[1] + "]";
+                                            }
+                                        }
+                                    }
+                                    @if (!String.IsNullOrEmpty(sliderValue))
+                                    {
+                                        <input type="text" class="price-slider" data-slider-value="@sliderValue">
+                                    }
+                                    else
+                                    {
+                                        <input type="text" class="price-slider">
+                                    }
+                                    
+
+                                </div>
+                                <!-- /.price-range-holder -->
+                                <a href="#" id="btn_price_filter" class="lnk btn btn-primary">Lọc</a>
+                                <a href="#" id="btn_cancel_price_filter" class="lnk btn btn-danger">Hủy lọc</a>
+                            </div>
+                            <!-- /.sidebar-widget-body -->
+                        </div>
+                        <!-- /.sidebar-widget -->
+                        <!-- ============================================== PRICE SILDER : END ============================================== -->
+                        </div>
+                    <!-- /.sidebar-filter -->
+                </div>
+                <!-- /.sidebar-module-container -->
+            </div>
+            <!-- /.sidebar -->
+            @{
+                string rangePrice = Request.QueryString["range_price"];
+                string sort = Request.QueryString["sort"];
+            }
+            @Html.Action("ShowProductInCategory", new { 
+                id = Model.GroupID, 
+                range_price = rangePrice,
+                sort = sort
+            })
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container -->
+</div>
+<!-- /.body-content -->
+
+<!-- Modal -->
+<div class="modal fade" id="myModal" data-backdrop="false" role="dialog">
+    <div class="modal-dialog" style="width:300px;">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">Chọn màu sắc</h4>
+            </div>
+            <div class="modal-body" style="text-align:center">
+                <select class="form-control" id="list_color"></select>
+            </div>
+            <div class="modal-footer">
+                <button id="btn_add" type="button" class="btn btn-success" data-dismiss="modal">Thêm vào giỏ</button>
+                <button id="btn_cancel" type="button" class="btn btn-danger" data-dismiss="modal">Hủy</button>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+
+
+
+@section masterjs
+{
+    <script type="text/javascript">
+       
+        $(document).ready(function() {
+            // Khởi tạo slider
+            var sliderElement = $('.price-slider');
+            if (sliderElement.length > 0) {
+                var sliderOptions = {
+                    min: 0,
+                    max: 100000000,
+                    step: 1000000,
+                    range: true,
+                    handle: "square",
+                    formatter: function (value) {
+                        return 'Từ ' + addThousandsSeparator(value[0]) + ' đến ' + addThousandsSeparator(value[1]);
+                    }
+                };
+                
+                // Khởi tạo slider
+                var slider = sliderElement.slider(sliderOptions);
+                
+                // Nếu có giá trị từ query string, set vào slider sau khi khởi tạo
+                var dataValue = sliderElement.attr('data-slider-value');
+                if (dataValue) {
+                    try {
+                        var parsedValue = JSON.parse(dataValue);
+                        if (Array.isArray(parsedValue) && parsedValue.length === 2) {
+                            sliderElement.slider('setValue', parsedValue);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing slider value:', e);
+                    }
+                }
+            }
+
+            $('[data-toggle="tooltip"]').tooltip();
+            
+            $("#btn_price_filter").click(function (e) {
+                e.preventDefault();
+                var slider = $(".price-slider");
+                if (slider.length === 0) {
+                    console.error('Slider not found');
+                    return false;
+                }
+                
+                try {
+                    var sliderValue = slider.slider('getValue');
+                    console.log('Slider value:', sliderValue);
+                    
+                    // Slider trả về array [min, max]
+                    if (Array.isArray(sliderValue) && sliderValue.length === 2) {
+                        var priceRange = sliderValue[0] + ',' + sliderValue[1];
+                        console.log('Price range:', priceRange);
+                        var url = replaceParam('range_price', priceRange);
+                        // Xóa page khi lọc để về trang 1
+                        url = replaceParam('page', '', url);
+                        console.log('Final URL:', url);
+                        window.location.href = url;
+                    } else {
+                        console.error('Invalid slider value:', sliderValue);
+                        alert('Vui lòng chọn khoảng giá hợp lệ');
+                    }
+                } catch (error) {
+                    console.error('Error getting slider value:', error);
+                    alert('Có lỗi xảy ra khi lọc giá. Vui lòng thử lại.');
+                }
+                return false;
+            });
+            
+            $("#btn_cancel_price_filter").click(function (e) {
+                e.preventDefault();
+                var url = replaceParam('range_price', '');
+                url = replaceParam('page', '', url);
+                window.location.href = url;
+                return false;
+            });
+        }); 
+        function replaceParam(key, value, currentUrl) {
+            var baseUrl = currentUrl || (window.location.pathname + window.location.search);
+            var parts = baseUrl.split('?');
+            var pathname = parts[0];
+            var searchPart = parts.length > 1 ? '?' + parts[1] : '';
+            var params = toParams(searchPart);
+            
+            // Nếu value rỗng hoặc null, xóa param đó
+            if (!value || value === '' || value === 'null' || value === 'undefined') {
+                delete params[key];
+            } else {
+                params[key] = value;
+            }
+
+            var queryString = jQuery.param(params);
+            return queryString ? pathname + "?" + queryString : pathname;
+        }
+
+        function toParams(searchUrl) {
+            var result = {}
+            if (searchUrl == '')
+                return result;
+
+            var queryString = searchUrl.substr(1);
+
+            var params = queryString.split("&");
+
+            jQuery.each(params, function (index, param) {
+                var keyPair = param.split("=");
+
+                var key = keyPair[0];
+                var value = keyPair[1];
+
+                if (result[key] == undefined)
+                    result[key] = value
+                else {
+
+                    if (result[key] instanceof Array) //current var is an array just push another to it
+                        result[key].push(value)
+                    else { //duplicate var, then it must store as an array
+                        result[key] = [result[key]]
+                        result[key].push(value)
+                    }
+                }
+            })
+
+            return result;
+
+        }
+    </script>
+}

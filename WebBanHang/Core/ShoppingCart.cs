@@ -1,0 +1,101 @@
+using System.Collections.Generic;
+using System.Web;
+using WebBanLinhKienDienTu.Models;
+
+namespace WebBanLinhKienDienTu.Core
+{
+    public class ShoppingCart
+    {
+        public const string CartSessionKey = "ShyBoxShopCart";
+        public List<CartItem> Items { get; set; }
+        private static ShoppingCart m_instance = null;
+
+        private ShoppingCart()
+        { }
+
+        public static ShoppingCart Instance
+        {
+            get
+            {
+                if (HttpContext.Current.Session[CartSessionKey] == null)
+                {
+                    m_instance = new ShoppingCart();
+                    m_instance.Items = new List<CartItem>();
+                    HttpContext.Current.Session[CartSessionKey] = m_instance;
+                }
+                else
+                {
+                    m_instance = (ShoppingCart)HttpContext.Current.Session[CartSessionKey];
+                }
+                return m_instance;
+            }
+        }
+
+        public int GetCount()
+        {
+            int count = 0;
+            foreach (CartItem item in Items)
+                count += item.Quantity;
+            return count;
+        }
+
+        public long GetTotal()
+        {
+            long total = 0;
+            foreach (CartItem item in Items)
+                total += item.TotalPrice;
+            return total;
+        }
+
+        public void AddItem(Product product, Color color, int quantity = 1)
+        {
+            CartItem newItem = new CartItem(product, color);
+
+            if (Items.Contains(newItem))
+            {
+                foreach (CartItem item in Items)
+                {
+                    if (item.Equals(newItem))
+                    {
+                        item.Quantity += quantity;
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                newItem.Quantity = quantity;
+                Items.Add(newItem);
+            }
+        }
+
+        public void Remove(Product product, Color color)
+        {
+            CartItem oldItem = new CartItem(product, color);
+            foreach (CartItem item in Items)
+            {
+                if (item.Equals(oldItem))
+                {
+                    Items.Remove(oldItem);
+                    return;
+                }
+            }
+        }
+
+        public CartItem Update(Product product, Color color, int quantity)
+        {
+            CartItem oldItem = new CartItem(product, color);
+            CartItem item = Items.Find(x => x.Equals(oldItem));
+            if (item != null)
+            {
+                item.Quantity = quantity;
+            }
+            return item;
+        }
+
+        public void Clean()
+        {
+            Items.Clear();
+        }
+    }
+}

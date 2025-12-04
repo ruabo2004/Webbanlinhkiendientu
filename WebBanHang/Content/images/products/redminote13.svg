@@ -1,0 +1,13 @@
+﻿<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gredminote13" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="600" height="400" fill="url(#gredminote13)"/>
+  <text x="300" y="150" font-family="Arial" font-size="72" fill="white" text-anchor="middle" opacity="0.3">PHONE</text>
+  <text x="300" y="240" font-family="Arial" font-size="28" font-weight="bold" fill="white" text-anchor="middle">Redmi Note 13</text>
+  <rect x="240" y="265" width="120" height="4" fill="white" opacity="0.5"/>
+  <text x="300" y="320" font-family="Arial" font-size="20" fill="white" text-anchor="middle" opacity="0.7">Product Image</text>
+</svg>

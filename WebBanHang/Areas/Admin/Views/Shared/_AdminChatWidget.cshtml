@@ -1,0 +1,455 @@
+@* Admin Chat Widget - Floating widget để admin trả lời chat với khách hàng *@
+
+<!-- Chat Toggle Button -->
+@* <div id="admin-chat-widget-toggle" style="position: fixed; bottom: 20px; right: 20px; width: 60px; height: 60px; background: linear-gradient(135deg, #D70018 0%, #b80015 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 4px 12px rgba(215, 0, 24, 0.4); z-index: 9998; transition: all 0.3s;">
+    <i class="fa fa-comments" style="color: white; font-size: 24px;"></i>
+    <span id="admin-chat-badge" style="position: absolute; top: -5px; right: -5px; background: #ff4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: none; align-items: center; justify-content: center; font-size: 12px; font-weight: bold;">0</span>
+</div> *@
+
+<!-- Chat Window -->
+<div id="admin-chat-widget-window" style="display: none; position: fixed; bottom: 90px; right: 20px; width: 380px; height: 600px; background: white; border-radius: 12px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); z-index: 9999; flex-direction: column; overflow: hidden;">
+    <!-- Header -->
+    <div style="background: linear-gradient(135deg, #D70018 0%, #b80015 100%); color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h4 style="margin: 0; font-size: 16px; font-weight: bold;">Chat với Khách hàng</h4>
+            <small style="opacity: 0.9; font-size: 12px;" id="admin-chat-status">Đang kết nối...</small>
+        </div>
+        <button id="admin-chat-widget-close" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;">
+            <i class="fa fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Customer List -->
+    <div id="admin-chat-customer-list" style="flex: 1; overflow-y: auto; background: #f8f9fa;">
+        <div class="text-center" style="padding: 20px;">
+            <i class="fa fa-spinner fa-spin"></i> Đang tải...
+        </div>
+    </div>
+
+    <!-- Chat Area (hidden by default) -->
+    <div id="admin-chat-conversation" style="display: none; flex: 1; flex-direction: column;">
+        <!-- Customer Info Header -->
+        <div style="background: white; padding: 12px 15px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong id="admin-chat-customer-name" style="font-size: 14px;"></strong>
+                <small id="admin-chat-customer-info" class="text-muted" style="display: block; font-size: 12px;"></small>
+            </div>
+            <button id="admin-chat-back-to-list" style="background: none; border: none; color: #666; cursor: pointer; padding: 5px 10px;">
+                <i class="fa fa-arrow-left"></i> Quay lại
+            </button>
+        </div>
+
+        <!-- Messages -->
+        <div id="admin-chat-messages" style="flex: 1; overflow-y: auto; padding: 15px; background: #f8f9fa;">
+            <!-- Messages will be loaded here -->
+        </div>
+
+        <!-- Input -->
+        <div style="padding: 15px; background: white; border-top: 1px solid #e0e0e0;">
+            <div style="display: flex; gap: 10px;">
+                <input type="text" id="admin-chat-message-input" class="form-control" placeholder="Nhập tin nhắn..." style="flex: 1;" />
+                <button id="admin-chat-send-btn" class="btn btn-primary" style="background: #D70018; border: none;">
+                    <i class="fa fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    #admin-chat-widget-toggle:hover {
+        transform: scale(1.1);
+        box-shadow: 0 6px 16px rgba(215, 0, 24, 0.5);
+    }
+
+    .admin-chat-customer-item {
+        padding: 12px 15px;
+        border-bottom: 1px solid #e0e0e0;
+        cursor: pointer;
+        transition: background 0.2s;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .admin-chat-customer-item:hover {
+        background: #e8e8e8;
+    }
+
+    .admin-chat-customer-item.active {
+        background: #D70018;
+        color: white;
+    }
+
+    .admin-chat-customer-item.active .text-muted {
+        color: rgba(255,255,255,0.8) !important;
+    }
+
+    .admin-chat-customer-name {
+        font-weight: bold;
+        font-size: 14px;
+        margin-bottom: 4px;
+    }
+
+    .admin-chat-customer-last-message {
+        font-size: 12px;
+        color: #666;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 200px;
+    }
+
+    .admin-chat-customer-meta {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 4px;
+    }
+
+    .admin-chat-unread-badge {
+        background: #ff4444;
+        color: white;
+        border-radius: 10px;
+        padding: 2px 8px;
+        font-size: 11px;
+        font-weight: bold;
+    }
+
+    .admin-chat-time {
+        font-size: 11px;
+        color: #999;
+    }
+
+    .admin-chat-message {
+        margin-bottom: 15px;
+        display: flex;
+        gap: 10px;
+    }
+
+    .admin-chat-message.admin {
+        flex-direction: row-reverse;
+    }
+
+    .admin-chat-message-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: #D70018;
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        flex-shrink: 0;
+    }
+
+    .admin-chat-message-content {
+        max-width: 70%;
+        background: white;
+        padding: 10px 12px;
+        border-radius: 12px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    .admin-chat-message.admin .admin-chat-message-content {
+        background: #D70018;
+        color: white;
+    }
+
+    .admin-chat-message-time {
+        font-size: 11px;
+        color: #999;
+        margin-top: 4px;
+    }
+
+    .admin-chat-message.admin .admin-chat-message-time {
+        text-align: right;
+        color: rgba(255,255,255,0.8);
+    }
+</style>
+
+<script>
+// Đợi tất cả scripts load xong
+(function() {
+    function waitForJQuery(callback) {
+        if (typeof jQuery !== 'undefined' && typeof $ !== 'undefined') {
+            callback();
+        } else {
+            setTimeout(function() { waitForJQuery(callback); }, 50);
+        }
+    }
+    
+    function waitForSignalR(callback) {
+        if (typeof jQuery !== 'undefined' && typeof $.connection !== 'undefined' && typeof $.connection.chatHub !== 'undefined') {
+            callback();
+        } else {
+            setTimeout(function() { waitForSignalR(callback); }, 50);
+        }
+    }
+    
+    function initAdminChatWidget() {
+        waitForJQuery(function() {
+            waitForSignalR(function() {
+                $(document).ready(function() {
+            var chatHub = $.connection.chatHub;
+            var currentCustomerId = null;
+            var customers = [];
+            var isOpen = false;
+
+            // === TOGGLE WIDGET ===
+            $('#admin-chat-widget-toggle').on('click', function() {
+                isOpen = !isOpen;
+                if (isOpen) {
+                    $('#admin-chat-widget-window').css('display', 'flex');
+                    loadCustomerList();
+                } else {
+                    $('#admin-chat-widget-window').hide();
+                }
+            });
+
+            $('#admin-chat-widget-close').on('click', function() {
+                isOpen = false;
+                $('#admin-chat-widget-window').hide();
+            });
+
+            // === LOAD CUSTOMER LIST ===
+            function loadCustomerList() {
+                $.ajax({
+                    url: '@Url.Action("GetCustomers", "Chat", new { area = "Admin" })',
+                    type: 'POST',
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            customers = response.data;
+                            renderCustomerList();
+                            updateUnreadBadge();
+                        }
+                    },
+                    error: function() {
+                        $('#admin-chat-customer-list').html('<div class="text-center text-danger" style="padding: 20px;">Lỗi khi tải danh sách khách hàng</div>');
+                    }
+                });
+            }
+
+            function renderCustomerList() {
+                var html = '';
+                if (customers.length === 0) {
+                    html = '<div class="text-center text-muted" style="padding: 20px;">Chưa có khách hàng nào chat</div>';
+                } else {
+                    customers.forEach(function(customer) {
+                        var timeStr = formatTime(customer.LastMessageDate);
+                        var unreadBadge = customer.UnreadCount > 0 
+                            ? '<span class="admin-chat-unread-badge">' + customer.UnreadCount + '</span>' 
+                            : '';
+                        html += '<div class="admin-chat-customer-item" data-customer-id="' + customer.CustomerID + '">' +
+                            '<div style="flex: 1;">' +
+                            '<div class="admin-chat-customer-name">' + escapeHtml(customer.FullName) + '</div>' +
+                            '<div class="admin-chat-customer-last-message text-muted">' + escapeHtml(customer.LastMessage || 'Chưa có tin nhắn') + '</div>' +
+                            '</div>' +
+                            '<div class="admin-chat-customer-meta">' +
+                            unreadBadge +
+                            '<div class="admin-chat-time">' + timeStr + '</div>' +
+                            '</div>' +
+                            '</div>';
+                    });
+                }
+                $('#admin-chat-customer-list').html(html);
+
+                // Click customer
+                $('.admin-chat-customer-item').on('click', function() {
+                    var customerId = parseInt($(this).data('customer-id'));
+                    selectCustomer(customerId);
+                });
+            }
+
+            function selectCustomer(customerId) {
+                currentCustomerId = customerId;
+                var customer = customers.find(c => c.CustomerID === customerId);
+                if (!customer) return;
+
+                // Update UI
+                $('.admin-chat-customer-item').removeClass('active');
+                $('.admin-chat-customer-item[data-customer-id="' + customerId + '"]').addClass('active');
+
+                // Show conversation
+                $('#admin-chat-customer-list').hide();
+                $('#admin-chat-conversation').css('display', 'flex');
+                $('#admin-chat-customer-name').text(customer.FullName);
+                $('#admin-chat-customer-info').text(customer.Email + ' | ' + customer.Phone);
+
+                // Load messages
+                loadMessages(customerId);
+            }
+
+            function loadMessages(customerId) {
+                $.ajax({
+                    url: '@Url.Action("GetMessages", "Chat", new { area = "Admin" })',
+                    type: 'POST',
+                    data: { customerId: customerId },
+                    success: function(response) {
+                        if (response.success && response.data) {
+                            renderMessages(response.data);
+                        }
+                    }
+                });
+            }
+
+            function renderMessages(messages) {
+                var html = '';
+                messages.forEach(function(msg) {
+                    var timeStr = formatTime(msg.CreatedDate);
+                    var isAdmin = msg.IsFromAdmin;
+                    html += '<div class="admin-chat-message ' + (isAdmin ? 'admin' : '') + '">' +
+                        '<div class="admin-chat-message-avatar">' +
+                        '<i class="fa ' + (isAdmin ? 'fa-user-shield' : 'fa-user') + '"></i>' +
+                        '</div>' +
+                        '<div class="admin-chat-message-content">' +
+                        escapeHtml(msg.Message) +
+                        '<div class="admin-chat-message-time">' + timeStr + '</div>' +
+                        '</div>' +
+                        '</div>';
+                });
+                $('#admin-chat-messages').html(html);
+                scrollToBottom();
+            }
+
+            // === SEND MESSAGE ===
+            function sendMessage() {
+                if (!currentCustomerId) return;
+                var message = $('#admin-chat-message-input').val().trim();
+                if (!message) return;
+
+                chatHub.server.sendAdminMessage(currentCustomerId, message);
+                $('#admin-chat-message-input').val('');
+            }
+
+            $('#admin-chat-send-btn').on('click', sendMessage);
+            $('#admin-chat-message-input').on('keypress', function(e) {
+                if (e.which === 13) {
+                    sendMessage();
+                }
+            });
+
+            // === BACK TO LIST ===
+            $('#admin-chat-back-to-list').on('click', function() {
+                $('#admin-chat-conversation').hide();
+                $('#admin-chat-customer-list').show();
+                currentCustomerId = null;
+            });
+
+            // === SIGNALR CLIENT METHODS ===
+            chatHub.client.receiveMessage = function(customerId, customerName, message, messageId, createdDate) {
+                // Update customer list
+                var customer = customers.find(c => c.CustomerID === customerId);
+                if (customer) {
+                    customer.LastMessage = message;
+                    customer.LastMessageDate = createdDate;
+                    customer.UnreadCount = (customer.UnreadCount || 0) + 1;
+                } else {
+                    // New customer
+                    loadCustomerList();
+                }
+                renderCustomerList();
+                updateUnreadBadge();
+
+                // If currently viewing this customer, add message
+                if (currentCustomerId === customerId) {
+                    var html = '<div class="admin-chat-message">' +
+                        '<div class="admin-chat-message-avatar"><i class="fa fa-user"></i></div>' +
+                        '<div class="admin-chat-message-content">' +
+                        escapeHtml(message) +
+                        '<div class="admin-chat-message-time">' + formatTime(createdDate) + '</div>' +
+                        '</div>' +
+                        '</div>';
+                    $('#admin-chat-messages').append(html);
+                    scrollToBottom();
+                }
+            };
+
+            chatHub.client.adminMessageSent = function(customerId, message, messageId, createdDate) {
+                if (currentCustomerId === customerId) {
+                    var html = '<div class="admin-chat-message admin">' +
+                        '<div class="admin-chat-message-avatar"><i class="fa fa-user-shield"></i></div>' +
+                        '<div class="admin-chat-message-content">' +
+                        escapeHtml(message) +
+                        '<div class="admin-chat-message-time">' + formatTime(createdDate) + '</div>' +
+                        '</div>' +
+                        '</div>';
+                    $('#admin-chat-messages').append(html);
+                    scrollToBottom();
+                }
+            };
+
+            chatHub.client.customerOnline = function(customerId, customerName) {
+                loadCustomerList();
+            };
+
+            chatHub.client.customerOffline = function(customerId) {
+                loadCustomerList();
+            };
+
+            // === HELPER FUNCTIONS ===
+            function formatTime(dateStr) {
+                var date = new Date(dateStr);
+                var now = new Date();
+                var diff = now - date;
+                
+                if (diff < 60000) return 'Vừa xong';
+                if (diff < 3600000) return Math.floor(diff / 60000) + ' phút trước';
+                if (diff < 86400000) return Math.floor(diff / 3600000) + ' giờ trước';
+                
+                return date.toLocaleDateString('vi-VN') + ' ' + 
+                       date.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+            }
+
+            function escapeHtml(text) {
+                var map = {
+                    '&': '&amp;',
+                    '<': '&lt;',
+                    '>': '&gt;',
+                    '"': '&quot;',
+                    "'": '&#039;'
+                };
+                return text.replace(/[&<>"']/g, function(m) { return map[m]; });
+            }
+
+            function scrollToBottom() {
+                var messages = $('#admin-chat-messages');
+                messages.scrollTop(messages[0].scrollHeight);
+            }
+
+            function updateUnreadBadge() {
+                var totalUnread = customers.reduce(function(sum, c) {
+                    return sum + (c.UnreadCount || 0);
+                }, 0);
+                if (totalUnread > 0) {
+                    $('#admin-chat-badge').text(totalUnread > 99 ? '99+' : totalUnread).show();
+                } else {
+                    $('#admin-chat-badge').hide();
+                }
+            }
+
+            // === START SIGNALR ===
+            $.connection.hub.start().done(function() {
+                $('#admin-chat-status').text('Đã kết nối');
+                chatHub.server.joinAdminGroup();
+                loadCustomerList();
+            }).fail(function(error) {
+                $('#admin-chat-status').text('Lỗi kết nối');
+                console.error('Failed to connect:', error);
+                });
+            });
+        });
+    }
+    
+    // Bắt đầu khởi tạo khi DOM ready
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(initAdminChatWidget, 100);
+        });
+    } else {
+        setTimeout(initAdminChatWidget, 100);
+    }
+})();
+</script>
+

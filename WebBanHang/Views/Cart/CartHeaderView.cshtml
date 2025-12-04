@@ -1,0 +1,11 @@
+@{
+    var cart = ShoppingCart.Instance;
+    var cartCount = cart.GetCount();
+}
+
+<a href="@Url.Action("Index", "Cart")" id="cart_button" style="background-color: transparent; color: white; padding: 8px 16px; display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 500; cursor: pointer; border: none; text-decoration: none;">
+    <i class="fa fa-shopping-cart" style="font-size: 18px;"></i>
+    <span>Giỏ hàng</span>
+    <span id="cart-count" style="background-color: #ff4d4d; border: 1px solid rgba(255,255,255,0.3); color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; font-weight: 500; min-width: 20px; text-align: center; display: inline-block;">@cartCount</span>
+</a>
+

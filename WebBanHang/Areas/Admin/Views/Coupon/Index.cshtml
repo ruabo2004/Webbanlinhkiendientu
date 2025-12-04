@@ -1,0 +1,163 @@
+@{
+    ViewBag.Title = "Quản lý mã giảm giá";
+    Layout = "~/Areas/Admin/Views/Shared/_LayoutPage.cshtml";
+}
+
+<div class="container">
+    <!-- Page-Title -->
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="btn-group pull-right m-t-15">
+                <a href="@Url.Action("Create")" class="btn btn-primary waves-effect waves-light">
+                    <span class="btn-label">
+                        <i class="zmdi zmdi-plus"></i>
+                    </span>Thêm mã giảm giá
+                </a>
+            </div>
+            <h4 class="page-title">@ViewBag.Title</h4>
+        </div>
+    </div>
+
+    @if (TempData["Success"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade in" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">×</span>
+            </button>
+            <strong>Thành công!</strong> @TempData["Success"]
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="card-box table-responsive">
+                <div id="datatable_wrapper" class="dataTables_wrapper form-inline dt-bootstrap4 no-footer">
+                    <div class="col-md-12">
+                        <table id="datatable" class="table table-striped table-bordered dataTable no-footer" role="grid" aria-describedby="datatable_info">
+                            <thead>
+                                <tr role="row">
+                                    <th width="8%">ID</th>
+                                    <th width="15%">Mã</th>
+                                    <th width="10%">Giảm</th>
+                                    <th width="10%">Loại</th>
+                                    <th width="10%">Free Ship</th>
+                                    <th width="12%">Từ ngày</th>
+                                    <th width="12%">Đến ngày</th>
+                                    <th width="10%">Trạng thái</th>
+                                    <th width="13%">Thao tác</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section scripts {
+    <script>
+        var table = $('#datatable').DataTable({
+            processing: true,
+            serverSide: true,
+            dom: "<'row'<'col-sm-2'l><'col-sm-6'f>>" +
+                "<'row'<'col-sm-12'tr>>" +
+                "<'row'<'col-sm-5'i><'col-sm-7'p>>",
+            autoWidth: false,
+            "bFilter": true,
+            ajax: {
+                url: "/Admin/Coupon/LoadCoupons",
+                type: "GET"
+            },
+            columnDefs: [
+                {
+                    targets: 8,
+                    render: function (data, type, full, meta) {
+                        if (type === 'display') {
+                            var activeBtn = full[7] === 'Hoạt động' 
+                                ? '<button type="button" onclick="toggleActive(' + full[0] + ')" class="btn btn-sm btn-success m-l-5" title="Vô hiệu hóa"><i class="fa fa-check"></i></button>'
+                                : '<button type="button" onclick="toggleActive(' + full[0] + ')" class="btn btn-sm btn-warning m-l-5" title="Kích hoạt"><i class="fa fa-ban"></i></button>';
+                            
+                            data = '<div style="min-width:120px" class="btn-group" role="group">' +
+                                '<a href="/Admin/Coupon/Edit/' + full[0] + '" class="btn btn-sm btn-info" title="Sửa"><i class="fa fa-edit"></i></a>' +
+                                activeBtn +
+                                '<button type="button" onclick="deleteCoupon(' + full[0] + ')" class="btn btn-sm btn-danger m-l-5" title="Xóa"><i class="fa fa-trash"></i></button>' +
+                                '</div>';
+                        }
+                        return data;
+                    }
+                },
+                {
+                    "defaultContent": "-",
+                    "targets": "_all"
+                }
+            ]
+        });
+
+        function toggleActive(id) {
+            $.ajax({
+                url: '/Admin/Coupon/ToggleActive',
+                data: { id: id },
+                type: 'POST',
+                dataType: 'JSON',
+                success: function (data) {
+                    if (data.status == 'success') {
+                        swal({
+                            title: 'Thành công!',
+                            text: data.message,
+                            type: 'success',
+                            timer: 1000
+                        });
+                        table.ajax.reload(null, false);
+                    } else {
+                        swal('Lỗi!', data.message, 'error');
+                    }
+                },
+                error: function () {
+                    swal('Lỗi!', 'Vui lòng kiểm tra lại', 'error');
+                }
+            });
+        }
+
+        function deleteCoupon(id) {
+            swal({
+                title: 'Bạn có chắc chắn muốn xóa?',
+                text: 'Khi đã xóa thì bạn không thể khôi phục lại',
+                type: 'warning',
+                showCancelButton: true,
+                confirmButtonClass: 'btn-danger',
+                confirmButtonText: 'Đồng ý',
+                cancelButtonText: 'Hủy bỏ',
+                closeOnConfirm: false
+            }, function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        url: '/Admin/Coupon/Delete',
+                        data: { id: id },
+                        type: 'POST',
+                        dataType: 'JSON',
+                        success: function (data) {
+                            if (data.status == 'success') {
+                                swal({
+                                    title: 'Thành công!',
+                                    text: data.message,
+                                    type: 'success',
+                                    timer: 1000
+                                });
+                                table.ajax.reload(null, false);
+                            } else {
+                                swal('Lỗi!', data.message, 'error');
+                            }
+                        },
+                        error: function () {
+                            swal('Lỗi!', 'Vui lòng kiểm tra lại', 'error');
+                        }
+                    });
+                }
+            });
+        }
+    </script>
+}
+

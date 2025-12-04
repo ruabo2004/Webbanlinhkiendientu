@@ -1,0 +1,321 @@
+﻿@model ProfileViewModel
+@{
+    ViewBag.Title = "Quản lý thông tin cá nhân";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    var provinces = (List<Province>)ViewData["Provinces"];
+    var provincesListItem = provinces.Select(s => new SelectListItem{
+        Value = s.ProvinceID.ToString(),
+        Text = StringUtils.ShortCity(s.Type) + " " + s.ProvinceName
+    });
+    var districts = new List<SelectListItem>();
+    var wards = new List<SelectListItem>();
+    if (ViewData["Districts"] != null) {
+        districts.AddRange((ViewData["Districts"] as List<District>).OrderBy(i=>i.DistrictName).Select(i => new SelectListItem { 
+            Value = i.DistrictID.ToString(),
+            Text = i.Type + " " + i.DistrictName
+        }));
+    }
+    if (ViewData["Wards"] != null)
+    {
+        wards.AddRange((ViewData["Wards"] as IEnumerable<Ward>).OrderBy(i => i.WardName).Select(i => new SelectListItem
+        {
+            Value = i.WardId.ToString(),
+            Text = i.Type+" "+i.WardName
+        }));
+    }
+}
+<div class="breadcrumb">
+    <div class="container">
+        <div class="breadcrumb-inner">
+            <ul class="list-inline list-unstyled">
+                <li><a href="@Url.Action("Index","Home")">Trang chủ</a></li>
+                <li class='active'>@ViewBag.Title</li>
+            </ul>
+        </div><!-- /.breadcrumb-inner -->
+    </div><!-- /.container -->
+</div><!-- /.breadcrumb -->
+<div class="body-content outer-top-bd">
+    <div class="container">
+        @if (TempData["SuccessMessage"] != null)
+        {
+            <div class="alert alert-success alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="fa fa-check-circle"></i> @TempData["SuccessMessage"]
+            </div>
+        }
+        @if (TempData["ErrorMessage"] != null)
+        {
+            <div class="alert alert-danger alert-dismissible" role="alert">
+                <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <i class="fa fa-exclamation-triangle"></i> @TempData["ErrorMessage"]
+            </div>
+        }
+        @using (Html.BeginForm("Profile", "Customer", FormMethod.Post, new { @class = "form-horizontal" }))
+        {   
+        <fieldset>    
+            <!-- Form Name -->
+            <legend>Thông tin cá nhân</legend>
+            
+            @if (UserManager.CurrentCustomer.MemberRank != null)
+            {
+                var rank = UserManager.CurrentCustomer.MemberRank;
+                var customer = UserManager.CurrentCustomer;
+                var progressPercent = rank.GetProgressToNextRank(customer.TotalSpent);
+                var amountToNext = rank.GetAmountToNextRank(customer.TotalSpent);
+                
+                var gradientColor = "";
+                switch (rank.RankID)
+                {
+                    case 1:
+                        gradientColor = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                        break;
+                    case 2:
+                        gradientColor = "linear-gradient(135deg, #CD7F32 0%, #8B4513 100%)";
+                        break;
+                    case 3:
+                        gradientColor = "linear-gradient(135deg, #C0C0C0 0%, #808080 100%)";
+                        break;
+                    case 4:
+                        gradientColor = "linear-gradient(135deg, #FFD700 0%, #FFA500 100%)";
+                        break;
+                    case 5:
+                        gradientColor = "linear-gradient(135deg, #00D4FF 0%, #0099CC 100%)";
+                        break;
+                    default:
+                        gradientColor = "linear-gradient(135deg, #667eea 0%, #764ba2 100%)";
+                        break;
+                }
+                
+                <div class="member-rank-card" style="background: @gradientColor; padding: 20px; border-radius: 10px; margin-bottom: 20px; color: white; box-shadow: 0 4px 6px rgba(0,0,0,0.1); text-shadow: 0 1px 2px rgba(0,0,0,0.3);">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 style="margin-top: 0; color: white;">
+                                <i class="@rank.GetIconClass()"></i> 
+                                <strong>@rank.RankName</strong>
+                                <small style="opacity: 0.9;">(@rank.RankNameEn)</small>
+                            </h3>
+                            <p style="margin: 5px 0; opacity: 0.95;">@rank.Description</p>
+                            <p style="margin: 5px 0; opacity: 0.95;">
+                                <i class="fa fa-money"></i> Tổng chi tiêu: <strong>@Html.FormatCurrency(customer.TotalSpent) đ</strong>
+                            </p>
+                            @if (rank.DiscountPercent > 0)
+                            {
+                                <p style="margin: 5px 0; opacity: 0.95;">
+                                    <i class="fa fa-gift"></i> Ưu đãi: <strong>Giảm @rank.DiscountPercent% mọi đơn hàng</strong>
+                                </p>
+                            }
+                        </div>
+                        <div class="col-md-4 text-right">
+                            @if (amountToNext.HasValue)
+                            {
+                                <p style="margin: 10px 0; font-size: 14px; opacity: 0.9;">Hạng tiếp theo: <strong>@rank.GetNextRankName()</strong></p>
+                                <p style="margin: 5px 0; font-size: 13px; opacity: 0.85;">Còn thiếu: <strong>@Html.FormatCurrency(amountToNext.Value) đ</strong></p>
+                                <div class="progress" style="height: 8px; margin-top: 10px; background-color: rgba(255,255,255,0.3);">
+                                    <div class="progress-bar" role="progressbar" style="width: @progressPercent.ToString("0.0")%; background-color: rgba(255,255,255,0.9);">
+                                    </div>
+                                </div>
+                                <small style="opacity: 0.8;">@progressPercent.ToString("0.0")% để lên hạng</small>
+                            }
+                            else
+                            {
+                                <p style="margin: 20px 0; font-size: 16px;">
+                                    <i class="fa fa-trophy" style="font-size: 40px;"></i>
+                                    <br/>
+                                    <strong>Hạng cao nhất!</strong>
+                                </p>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+            
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs" role="tablist">
+                @{
+                    var passwordChanged = TempData["PasswordChanged"] != null && (bool)TempData["PasswordChanged"];
+                    var activeTab = passwordChanged ? "account" : "general";
+                }
+                <li class="@(activeTab == "general" ? "active" : "")"><a href="#general" role="tab" data-toggle="tab">Thông tin chung</a></li>
+                <li class="@(activeTab == "account" ? "active" : "")"><a href="#account" role="tab" data-toggle="tab">Tài khoản</a></li>
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane @(activeTab == "general" ? "active" : "") vertical-pad" id="general">
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.FullName, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.FullName, new { @class = "form-control input-md" })
+                            @Html.ValidationMessageFor(m => m.FullName)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.Phone, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.TextBoxFor(m => m.Phone, new { @class = "form-control input-md"})
+                            @Html.ValidationMessageFor(m => m.Phone)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.Address, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            <small>Vui lòng điền CHÍNH XÁC "tầng, số nhà, đường" để tránh trường hợp đơn hàng bị hủy ngoài ý muốn *</small>
+                            @Html.TextBoxFor(m => m.Address, new { @class = "form-control input-md" })
+                            @Html.ValidationMessageFor(m => m.Address)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.ProvinceID, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.ProvinceID,
+                            new SelectList(provincesListItem, "Value", "Text"), "Xin vui lòng chọn Tỉnh/Tp",
+                        new { @class = "form-control input-md address-choose", id = "drop-province" })
+                            @Html.ValidationMessageFor(m => m.ProvinceID)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.DistrictID, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.DistrictID,
+                            new SelectList(districts, "Value", "Text"), "Xin vui lòng chọn Quận/Huyện",
+                     new { @class = "form-control input-md address-choose", id = "drop-district" })
+                            @Html.ValidationMessageFor(m => m.DistrictID)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.WardID, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.DropDownListFor(model => model.WardID,
+                            new SelectList(wards, "Value", "Text"), "Xin vui lòng chọn Phường/Xã",
+                            new { @class = "form-control input-md address-choose", id = "drop-ward" })
+                            @Html.ValidationMessageFor(m => m.WardID)
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane @(activeTab == "account" ? "active" : "") vertical-pad" id="account">
+                    <div class="form-group m-t-15">
+                        <label class="col-md-4 control-label">Email: </label>
+                        <div class="col-md-4">
+                            <input type="text" class="form-control input-md" disabled value="@UserManager.CurrentCustomer.Email" />
+                        </div>
+                    </div>
+
+                    @{
+                        var currentCustomer = UserManager.CurrentCustomer;
+                        bool isSocialLogin = !String.IsNullOrEmpty(currentCustomer.GoogleID) || !String.IsNullOrEmpty(currentCustomer.FacebookID);
+                        bool hasPassword = !String.IsNullOrEmpty(currentCustomer.Passwrord);
+                    }
+
+                    @if (isSocialLogin && !hasPassword)
+                    {
+                        <div class="form-group m-t-15">
+                            <div class="col-md-8 col-md-offset-2">
+                                <div class="alert alert-info">
+                                    <i class="fa fa-info-circle"></i>
+                                    <strong>Bạn đang đăng nhập bằng @((!String.IsNullOrEmpty(currentCustomer.GoogleID)) ? "Google" : "Facebook")</strong>
+                                    <br/>Bạn có thể đặt mật khẩu để đăng nhập bằng email trong tương lai.
+                                </div>
+                            </div>
+                        </div>
+                    }
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.NewPasswrord, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.PasswordFor(m => m.NewPasswrord, new { @class = "form-control input-md", placeholder = isSocialLogin && !hasPassword ? "Đặt mật khẩu mới" : "Chỉ nhập nếu muốn đổi mật khẩu" })
+                            @Html.ValidationMessageFor(m => m.NewPasswrord)
+                        </div>
+                    </div>
+
+                    <div class="form-group m-t-15">
+                        @Html.LabelFor(m => m.ConfirmPasswrord, new { @class = "col-md-4 control-label" })
+                        <div class="col-md-4">
+                            @Html.PasswordFor(m => m.ConfirmPasswrord, new { @class = "form-control input-md", placeholder = "Nhập lại mật khẩu mới" })
+                            @Html.ValidationMessageFor(m => m.ConfirmPasswrord)
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Button -->
+            <div class="form-group">
+                <label class="col-md-4 control-label" for="singlebutton"></label>
+                <div class="col-md-4">
+                    <button type="submit" id="singlebutton" name="singlebutton" class="btn btn-primary">Cập nhật thông tin</button>
+                </div>
+            </div>
+        </fieldset>
+        }
+    </div>  <!--/container-->
+</div>
+
+
+@section masterjs{
+    <script>
+        $(document).ready(function() {
+            // Xử lý địa chỉ dropdown
+            $('.address-choose').change(function () {
+                var id = this.id;
+                var value = $(this).val();
+                if (id == 'drop-province') {
+                    $('#drop-district').html('<option value="">Xin vui lòng chọn Quận/Huyện</option>');
+                    $('#drop-ward').html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+                    $.getJSON("/AppApi/District_In_Province", { id: value }, function (data) {
+                        if (data.status == 'ok') {
+                            $.each(data.districts, function (i, item) {
+                                $('#drop-district').append('<option value="' + item.district_id + '">' + item.district_type + ' ' + item.district_name + '</option>');
+                            });
+                        }
+                    });
+                } else if (id == 'drop-district') {
+                    $('#drop-ward').html('<option value="">Xin vui lòng chọn Phường/Xã</option>');
+                    $.getJSON("/AppApi/Ward_In_District", { id: value }, function (data) {
+                        if (data.status == 'ok') {
+                            $.each(data.wards, function (i, item) {
+                                $('#drop-ward').append('<option value="' + item.ward_id + '">' + item.ward_type + ' ' + item.ward_name + '</option>');
+                            });
+                        }
+                    });
+                }
+            });
+            
+            // Nếu có thông báo thành công, scroll đến thông báo và highlight
+            @if (TempData["SuccessMessage"] != null)
+            {
+                var passwordChanged = TempData["PasswordChanged"] != null && (bool)TempData["PasswordChanged"];
+                <text>
+                setTimeout(function() {
+                    // Scroll đến thông báo
+                    if ($('.alert-success').length > 0) {
+                        $('html, body').animate({
+                            scrollTop: $('.alert-success').offset().top - 100
+                        }, 500);
+                        
+                        // Highlight thông báo
+                        $('.alert-success').css({
+                            'box-shadow': '0 0 20px rgba(40, 167, 69, 0.5)',
+                            'border': '2px solid #28a745'
+                        });
+                    }
+                    
+                    // Nếu đổi mật khẩu, đảm bảo giữ nguyên tab "Tài khoản" và xóa các field mật khẩu
+                    @if (passwordChanged)
+                    {
+                        <text>
+                        // Đảm bảo tab "Tài khoản" đang active (giữ nguyên tab hiện tại)
+                        $('a[href="#account"]').tab('show');
+                        
+                        // Xóa các field mật khẩu
+                        $('#NewPasswrord').val('');
+                        $('#ConfirmPasswrord').val('');
+                        </text>
+                    }
+                }, 100);
+                </text>
+            }
+        });
+    </script>    
+}

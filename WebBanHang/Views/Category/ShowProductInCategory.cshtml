@@ -1,0 +1,434 @@
+﻿@model IList<Product>
+@{
+    var products = Model ?? new List<Product>();
+    const int initialVisibleCount = 8;
+    var initialProducts = products.Take(initialVisibleCount).ToList();
+    var remainingProductsList = products.Skip(initialVisibleCount).ToList();
+    int totalProducts = products.Count;
+    bool showLoadMore = remainingProductsList.Any();
+    int remainingProducts = remainingProductsList.Count;
+}
+<div class='col-md-9'>
+    <div class="clearfix filters-container m-t-10">
+        <div class="row">
+            <div class="col col-sm-6 col-md-2">
+                <div class="filter-tabs">
+                    <ul id="filter-tabs" class="nav nav-tabs nav-tab-box nav-tab-fa-icon">
+                        <li class="active">
+                            <a data-toggle="tab" href="#grid-container"><i class="icon fa fa-th-list"></i>Lưới</a>
+                        </li>
+                        <li><a data-toggle="tab" href="#list-container"><i class="icon fa fa-th"></i>D.Sách</a></li>
+                    </ul>
+                </div>
+                <!-- /.filter-tabs -->
+            </div>
+            <!-- /.col -->
+            <div class="col col-sm-12 col-md-7">
+                <div class="col col-sm-3 col-md-12 no-padding">
+                    <div class="lbl-cnt">
+                        <span class="lbl">Sắp xếp theo</span>
+                        <div class="fld inline">
+                            <div class="dropdown dropdown-small dropdown-med dropdown-white inline">
+                                <button data-toggle="dropdown" type="button" class="btn dropdown-toggle">
+                                    @switch (Request.QueryString["sort"])
+                                    {
+                                        case "name_asc":
+                                            @Html.Raw("Tên sản phẩm: A - Z")
+                                            break;
+                                        case "name_desc":
+                                            @Html.Raw("Tên sản phẩm: Z - A")
+                                            break;
+                                        case "price_asc":
+                                            @Html.Raw("Giá: từ thấp đến cao")
+                                            break;
+                                        case "price_desc":
+                                            @Html.Raw("Giá: từ cao xuống thấp")
+                                            break;
+                                        case "newest":
+                                            @Html.Raw("Mới nhất")
+                                            break;
+                                        case "oldest":
+                                            @Html.Raw("Cũ nhất")
+                                            break;
+                                        case "discount_desc":
+                                            @Html.Raw("Giảm giá nhiều nhất")
+                                            break;
+                                        case "rating_desc":
+                                            @Html.Raw("Đánh giá cao nhất")
+                                            break;
+                                        default:
+                                             @Html.Raw("Mặc định")
+                                            break;
+                                    }
+                                    <span class="caret"></span>
+                                </button>
+                                <ul role="menu" class="dropdown-menu">
+                                    <li role="presentation"><a href="?@Url.QueryString("sort","default")">Mặc định</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "newest")">Mới nhất</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "price_asc")">Giá: từ thấp đến cao</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "price_desc")">Giá: từ cao xuống thấp</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "discount_desc")">Giảm giá nhiều nhất</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "rating_desc")">Đánh giá cao nhất</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "name_asc")">Tên sản phẩm: A - Z</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "name_desc")">Tên sản phẩm: Z - A</a></li>
+                                    <li role="presentation"><a href="?@Url.QueryString("sort", "oldest")">Cũ nhất</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <!-- /.fld -->
+                    </div>
+                    <!-- /.lbl-cnt -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <div class="search-result-container">
+        <div id="myTabContent" class="tab-content">
+            <div class="tab-pane active " id="grid-container">
+                <div class="category-product inner-top-vs">
+                    @for (int row = 0; row < initialProducts.Count; row += 4)
+                    {
+                    <div class="row">
+                            @for (int col = row; col < Math.Min(row + 4, initialProducts.Count); col++)
+                            {
+                                var product = initialProducts[col];
+                                <div class="col-sm-6 col-md-3 wow fadeInUp product-card">
+                                <div class="products">
+                                    <div class="product">
+                                        <div class="product-image">
+                                            <div class="image">
+                                                @{
+                                                    var imgUrl = ImageHelper.DefaultImage();
+                                                    if (product.ImageProducts.Count > 0)
+                                                    {
+                                                        imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                                    }
+                                                    imgUrl += "?w=195&h=250";
+                                                }
+                                                <a href="@Url.Action("Detail", "Product", new { id = product.ProductID })"><img src="@Url.Content("~/Content/images/blank.gif")" data-echo="@imgUrl" alt=""></a>
+                                            </div>
+                                            <!-- /.image -->
+                                            <div class="tag new"><span>new</span></div>
+                                        </div>
+                                        <!-- /.product-image -->
+
+                                        <div class="product-info text-left">
+                                            <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID })">@product.ProductName</a></h3>
+                                            <div class="description"></div>
+                                            <div class="product-price">
+                                                <span class="price">
+                                                    @if (product.isSale())
+                                                    {
+                                                        @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                                        }
+                                                        else
+                                                        {
+                                                        @Html.FormatCurrency(product.Price) <span>đ</span>
+                                                    }
+                                                </span>
+                                                    @if (product.isSale())
+                                                    {
+                                                    <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                                }
+                                                </div>
+                                                <!-- /.product-price -->
+                                            </div>
+                                            <!-- /.product-info -->
+                                            <div class="cart clearfix animate-effect">
+                                                <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                    <span class="btn-label"><i class="fa fa-shopping-cart"></i></span>Thêm giỏ hàng
+                                                </a>
+                                            </div><!-- /.cart -->
+                                        </div>
+                                        <!-- /.product -->
+                                    </div>
+                                    <!-- /.products -->
+                                </div>
+                            }
+                        </div>
+                    }
+
+                    @if (remainingProductsList.Any())
+                    {
+                        <div id="remaining-grid-products" class="extra-products" style="display:none;">
+                            @for (int row = 0; row < remainingProductsList.Count; row += 4)
+                            {
+                    <div class="row">
+                                    @for (int col = row; col < Math.Min(row + 4, remainingProductsList.Count); col++)
+                                    {
+                                        var product = remainingProductsList[col];
+                                        <div class="col-sm-6 col-md-3 wow fadeInUp product-card">
+                                            <div class="products">
+                                                <div class="product">
+                                                    <div class="product-image">
+                                                        <div class="image">
+                                                            @{
+                                                                var imgUrl = ImageHelper.DefaultImage();
+                                                                if (product.ImageProducts.Count > 0)
+                                                                {
+                                                                    imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                                                }
+                                                                imgUrl += "?w=195&h=250";
+                                                            }
+                                                            <a href="@Url.Action("Detail", "Product", new { id = product.ProductID })"><img src="@Url.Content("~/Content/images/blank.gif")" data-echo="@imgUrl" alt=""></a>
+                                                        </div>
+                                                        <!-- /.image -->
+                                                        <div class="tag new"><span>new</span></div>
+                                                    </div>
+                                                    <!-- /.product-image -->
+
+                                                    <div class="product-info text-left">
+                                                        <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID })">@product.ProductName</a></h3>
+                                                        <div class="description"></div>
+                                                        <div class="product-price">
+                                                            <span class="price">
+                                                                @if (product.isSale())
+                                                                {
+                                                                    @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.FormatCurrency(product.Price) <span>đ</span>
+                                                                }
+                                                            </span>
+                                                            @if (product.isSale())
+                                                            {
+                                                                <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                                            }
+                                            </div>
+                                            <!-- /.product-price -->
+                                        </div>
+                                        <!-- /.product-info -->
+                                        <div class="cart clearfix animate-effect">
+                                            <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                <span class="btn-label"><i class="fa fa-shopping-cart"></i></span>Thêm giỏ hàng
+                                            </a>
+                                        </div><!-- /.cart -->
+                                    </div>
+                                    <!-- /.product -->
+                                            </div>
+                                            <!-- /.products -->
+                                        </div>
+                                    }
+                                </div>
+                        }
+                    </div>
+                    }
+                </div>
+                <!-- /.category-product -->
+
+            </div>
+            <!-- /.tab-pane -->
+
+            <div class="tab-pane" id="list-container">
+                <div class="category-product inner-top-vs">
+                    @foreach (var product in initialProducts)
+                    {
+                        <div class="category-product-inner wow fadeInUp product-list-card">
+                        <div class="products">
+                            <div class="product-list product">
+                                <div class="row product-list-row">
+                                    <div class="col col-sm-4 col-lg-4">
+                                        <div class="product-image">
+                                            <div class="image">
+                                                @{
+                                                    var imgUrl = ImageHelper.DefaultImage();
+                                                    if (product.ImageProducts.Count > 0)
+                                                    {
+                                                        imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                                    }
+                                                    imgUrl += "?w=195&h=250";
+                                                }
+                                                <a href="@Url.Action("Detail", "Product", new { id = product.ProductID })"><img src="@ImageHelper.BlankImage()" data-echo="@imgUrl" alt=""></a>
+                                            </div>
+
+                                        </div>
+                                        <!-- /.product-image -->
+                                    </div>
+                                    <!-- /.col -->
+                                    <div class="col col-sm-8 col-lg-8">
+                                        <div class="product-info">
+                                            <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID})">@product.ProductName</a></h3>
+                                            <div class="product-price">
+                                                <span class="price">
+                                                    @if (product.isSale())
+                                                    {
+                                                        @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                                    }
+                                                    else
+                                                    {
+                                                        @Html.FormatCurrency(product.Price) <span>đ</span>
+                                                    }
+                                                </span>
+                                                @if (product.isSale())
+                                                {
+                                                    <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                                }
+
+                                            </div>
+                                            <!-- /.product-price -->
+                                            <div class="cart clearfix animate-effect">
+                                                <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                    <span class="btn-label"><i class="fa fa-shopping-cart"></i></span>Thêm giỏ hàng
+                                                </a>
+                                            </div><!-- /.cart -->
+                                            <!-- /.cart -->
+
+                                        </div>
+                                        <!-- /.product-info -->
+                                    </div>
+                                    <!-- /.col -->
+                                </div>
+                                <!-- /.product-list-row -->
+                                @if (product.SalePrice != 0 && (product.Price - product.SalePrice) > 0)
+                                {
+                                    <div class="tag sale"><span>-@(((product.Price - product.SalePrice) * 100) / product.Price)%</span></div>
+                                }
+                            </div>
+                            <!-- /.product-list -->
+                        </div>
+                        <!-- /.products -->
+                    </div>
+                    }
+
+                    @if (remainingProductsList.Any())
+                    {
+                        <div id="remaining-list-products" class="extra-products" style="display:none;">
+                            @foreach (var product in remainingProductsList)
+                            {
+                                <div class="category-product-inner wow fadeInUp product-list-card">
+                                    <div class="products">
+                                        <div class="product-list product">
+                                            <div class="row product-list-row">
+                                                <div class="col col-sm-4 col-lg-4">
+                                                    <div class="product-image">
+                                                        <div class="image">
+                                                            @{
+                                                                var imgUrl = ImageHelper.DefaultImage();
+                                                                if (product.ImageProducts.Count > 0)
+                                                                {
+                                                                    imgUrl = ImageHelper.ImageUrl(product.ImageProducts.FirstOrDefault().ImagePath);
+                                                                }
+                                                                imgUrl += "?w=195&h=250";
+                                                            }
+                                                            <a href="@Url.Action("Detail", "Product", new { id = product.ProductID })"><img src="@ImageHelper.BlankImage()" data-echo="@imgUrl" alt=""></a>
+                                                        </div>
+
+                                                    </div>
+                                                    <!-- /.product-image -->
+                                                </div>
+                                                <!-- /.col -->
+                                                <div class="col col-sm-8 col-lg-8">
+                                                    <div class="product-info">
+                                                        <h3 class="name"><a href="@Url.Action("Detail", "Product", new { id = product.ProductID})">@product.ProductName</a></h3>
+                                                        <div class="product-price">
+                                                            <span class="price">
+                                                                @if (product.isSale())
+                                                                {
+                                                                    @Html.FormatCurrency(product.SalePrice) <span>đ</span>
+                                                                }
+                                                                else
+                                                                {
+                                                                    @Html.FormatCurrency(product.Price) <span>đ</span>
+                                                                }
+                                                            </span>
+                                                            @if (product.isSale())
+                                                            {
+                                                                <span class="price-before-discount">@Html.FormatCurrency(product.Price) đ</span>
+                                                            }
+
+                                                        </div>
+                                                        <!-- /.product-price -->
+                                                        <div class="cart clearfix animate-effect">
+                                                            <a data-id="@product.ProductID" href="#" class="btn btn-labeled btn-info add-cart">
+                                                                <span class="btn-label"><i class="fa fa-shopping-cart"></i></span>Thêm giỏ hàng
+                                                            </a>
+                                                        </div><!-- /.cart -->
+                                                        <!-- /.cart -->
+
+                                                    </div>
+                                                    <!-- /.product-info -->
+                                                </div>
+                                                <!-- /.col -->
+                                            </div>
+                                            <!-- /.product-list-row -->
+                                            @if (product.SalePrice != 0 && (product.Price - product.SalePrice) > 0)
+                                            {
+                                                <div class="tag sale"><span>-@(((product.Price - product.SalePrice) * 100) / product.Price)%</span></div>
+                                            }
+                                        </div>
+                                        <!-- /.product-list -->
+                                    </div>
+                                    <!-- /.products -->
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+                <!-- /.category-product -->
+            </div>
+            <!-- /.tab-pane #list-container -->
+        </div>
+        <!-- /.tab-content -->
+        @if (showLoadMore)
+        {
+            <div class="load-more-container text-center m-t-30">
+                <a href="#" id="btn-load-more-products" class="btn btn-default btn-load-more">
+                    Xem thêm <strong>@remainingProducts</strong> sản phẩm <span class="caret"></span>
+                </a>
+            </div>
+        }
+    </div>
+    <!-- /.search-result-container -->
+</div>
+<style>
+    .load-more-container .btn-load-more {
+        min-width: 260px;
+        border-radius: 999px;
+        border: 1px solid #dcdcdc;
+        background-color: #fff;
+        padding: 12px 24px;
+        font-weight: 600;
+        color: #333;
+    }
+    .load-more-container .btn-load-more:hover {
+        border-color: #aaa;
+        color: #111;
+    }
+</style>
+<script type="text/javascript">
+    $(function () {
+        var $btnLoadMore = $('#btn-load-more-products');
+        if ($btnLoadMore.length) {
+            $btnLoadMore.on('click', function (e) {
+                e.preventDefault();
+                var $gridExtra = $('#remaining-grid-products');
+                var $listExtra = $('#remaining-list-products');
+
+                if ($gridExtra.length) {
+                    $gridExtra.stop(true, true).slideDown(300);
+                }
+                if ($listExtra.length) {
+                    $listExtra.stop(true, true).slideDown(300);
+                }
+
+                var $scrollTarget = $gridExtra.find('.product-card').first();
+                if (!$scrollTarget.length) {
+                    $scrollTarget = $listExtra.find('.product-list-card').first();
+                }
+                if ($scrollTarget.length) {
+                    $('html, body').animate({
+                        scrollTop: $scrollTarget.offset().top - 120
+                    }, 300);
+                }
+
+                $(this).closest('.load-more-container').fadeOut(200, function () {
+                    $(this).remove();
+                });
+            });
+        }
+    });
+</script>

@@ -1,0 +1,30 @@
+﻿<header id="admin-header" class="admin-topbar">
+    <div class="admin-topbar-content">
+        <button class="admin-sidebar-toggle" id="admin-sidebar-toggle">
+            <i class="fa fa-bars"></i>
+        </button>
+        
+        <div class="admin-topbar-right">
+            <a href="@Url.Action("Index", "Home", new { area = "" })" class="admin-topbar-link" title="Về trang chủ">
+                <i class="fa fa-home"></i>
+                <span class="hidden-xs">Trang chủ</span>
+            </a>
+            
+            <div class="admin-user-dropdown dropdown">
+                <a class="admin-user-toggle dropdown-toggle" data-toggle="dropdown" href="#" role="button">
+                    <img src="~/Content/admin/images/users/avatar-1.jpg" alt="user" class="admin-user-avatar">
+                    <span class="admin-username hidden-xs">@UserManager.CurrentUser.Username</span>
+                </a>
+                <div class="dropdown-menu dropdown-menu-right admin-user-menu">
+                    <div class="dropdown-header">
+                        <strong>@UserManager.CurrentUser.Username</strong>
+                    </div>
+                    <div class="dropdown-divider"></div>
+                    <a href="@Url.Action("Logout", "Auth", new { area = "Admin"})" class="dropdown-item">
+                        <i class="fa fa-sign-out"></i> Đăng xuất
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</header>
